@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Slim themed scrollbar for dashboard surfaces */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(29, 158, 117, 0.72) rgba(29, 158, 117, 0.12);
+}
+
+*::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+*::-webkit-scrollbar-track {
+  background: linear-gradient(
+    180deg,
+    rgba(29, 158, 117, 0.06),
+    rgba(29, 158, 117, 0.14)
+  );
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(93, 202, 165, 0.9),
+    rgba(29, 158, 117, 0.72)
+  );
+  border-radius: 999px;
+  border: 1px solid rgba(5, 20, 31, 0.95);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(118, 220, 185, 0.95),
+    rgba(29, 158, 117, 0.84)
+  );
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+select option {
+  color: #05141f;
+  background: #ffffff;
+}
+
+@keyframes previewBarSweep {
+  0%,
+  24% {
+    background-color: #1d9e75;
+    opacity: 1;
+    transform: scaleY(1.04);
+    filter: brightness(1.08);
+    box-shadow: 0 0 0.45rem rgba(29, 158, 117, 0.38);
+  }
+
+  52%,
+  100% {
+    background-color: rgba(29, 158, 117, 0.25);
+    opacity: 0.82;
+    transform: scaleY(1);
+    filter: brightness(1);
+    box-shadow: 0 0 0 rgba(29, 158, 117, 0);
+  }
+}
+
+.animate-preview-bar {
+  animation-name: previewBarSweep;
+  transform-origin: bottom center;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-iteration-count: infinite;
+  will-change: transform, background-color, opacity;
+}
+
+@keyframes secureDividerGlow {
+  0%,
+  100% {
+    opacity: 0.35;
+    text-shadow: 0 0 0 rgba(29, 158, 117, 0);
+  }
+
+  50% {
+    opacity: 0.95;
+    text-shadow: 0 0 0.65rem rgba(29, 158, 117, 0.55);
+  }
+}
+
+@keyframes secureLineBlink {
+  0%,
+  100% {
+    opacity: 0.25;
+    box-shadow: 0 0 0 rgba(29, 158, 117, 0);
+  }
+
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 0.85rem rgba(29, 158, 117, 0.35);
+  }
+}
+
+@keyframes secureDotPulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.5;
+    box-shadow: 0 0 0 rgba(29, 158, 117, 0);
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    box-shadow: 0 0 0.5rem rgba(29, 158, 117, 0.6);
+  }
+}
+
+.secure-divider-line {
+  background: linear-gradient(
+    90deg,
+    rgba(29, 158, 117, 0.05),
+    rgba(29, 158, 117, 0.45),
+    rgba(29, 158, 117, 0.05)
+  );
+  animation: secureLineBlink 2.2s ease-in-out infinite;
+}
+
+.secure-divider-text {
+  color: rgba(232, 244, 240, 0.35);
+  animation: secureDividerGlow 2.2s ease-in-out infinite;
+}
+
+.secure-divider-dot {
+  background: #1d9e75;
+  animation: secureDotPulse 1.6s ease-in-out infinite;
+}

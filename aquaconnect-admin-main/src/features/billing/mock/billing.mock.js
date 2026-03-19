@@ -1,0 +1,41 @@
+export const MOCK_BILLING_REPORTS = [
+  { woreda: 'Woreda 01', woredaId: 'w1', totalBills: 120, totalAmount: 18500, paidBills: 98, unpaidBills: 22, totalConsumption: 1480 },
+  { woreda: 'Woreda 02', woredaId: 'w2', totalBills: 95, totalAmount: 14200, paidBills: 80, unpaidBills: 15, totalConsumption: 1136 },
+  { woreda: 'Woreda 03', woredaId: 'w3', totalBills: 140, totalAmount: 21000, paidBills: 110, unpaidBills: 30, totalConsumption: 1680 },
+  { woreda: 'Woreda 04', woredaId: 'w4', totalBills: 88, totalAmount: 13200, paidBills: 70, unpaidBills: 18, totalConsumption: 1056 },
+  { woreda: 'Woreda 05', woredaId: 'w5', totalBills: 110, totalAmount: 16500, paidBills: 95, unpaidBills: 15, totalConsumption: 1320 },
+  { woreda: 'Woreda 06', woredaId: 'w6', totalBills: 75, totalAmount: 11250, paidBills: 60, unpaidBills: 15, totalConsumption: 900 },
+  { woreda: 'Woreda 07', woredaId: 'w7', totalBills: 130, totalAmount: 19500, paidBills: 105, unpaidBills: 25, totalConsumption: 1560 },
+  { woreda: 'Woreda 08', woredaId: 'w8', totalBills: 60, totalAmount: 9000, paidBills: 45, unpaidBills: 15, totalConsumption: 720 },
+];
+
+export const MOCK_TARIFFS = [
+  { id: 't1', pricePerCubicMeter: 8.00, effectiveFrom: '2025-01-01T00:00:00.000Z', createdAt: '2024-12-20T00:00:00.000Z' },
+  { id: 't2', pricePerCubicMeter: 10.50, effectiveFrom: '2025-07-01T00:00:00.000Z', createdAt: '2025-06-15T00:00:00.000Z' },
+  { id: 't3', pricePerCubicMeter: 12.50, effectiveFrom: '2026-01-01T00:00:00.000Z', createdAt: '2025-12-20T00:00:00.000Z' },
+];
+
+
+export const MOCK_METERS = [
+  { id: 'm1', meterNumber: 'MTR-001', createdAt: '2026-01-05T00:00:00.000Z', customer: { id: 'c1', fullName: 'Abebe Kebede', email: 'abebe@gmail.com', phoneE164: '+251912345690', paymentFlag: 'NONE', woreda: { id: 'w1', name: 'Woreda 01' } } },
+  { id: 'm2', meterNumber: 'MTR-002', createdAt: '2026-01-10T00:00:00.000Z', customer: { id: 'c2', fullName: 'Tigist Haile', email: 'tigist@gmail.com', phoneE164: '+251912345691', paymentFlag: 'WARNING', woreda: { id: 'w1', name: 'Woreda 01' } } },
+  { id: 'm3', meterNumber: 'MTR-003', createdAt: '2026-01-15T00:00:00.000Z', customer: { id: 'c3', fullName: 'Dawit Alemu', email: 'dawit@gmail.com', phoneE164: '+251912345692', paymentFlag: 'LEGAL_ACTION', woreda: { id: 'w1', name: 'Woreda 01' } } },
+  { id: 'm4', meterNumber: 'MTR-004', createdAt: '2026-02-01T00:00:00.000Z', customer: { id: 'c4', fullName: 'Selam Worku', email: 'selam@gmail.com', phoneE164: '+251912345693', paymentFlag: 'NONE', woreda: { id: 'w1', name: 'Woreda 01' } } },
+  { id: 'm5', meterNumber: 'MTR-005', createdAt: '2026-02-05T00:00:00.000Z', customer: { id: 'c6', fullName: 'Kalkidan Mesfin', email: 'kalkidan@gmail.com', phoneE164: '+251912345695', paymentFlag: 'NONE', woreda: { id: 'w1', name: 'Woreda 01' } } },
+];
+
+export const MOCK_READINGS = [
+  { id: 'r1', readingValue: 120, readingDate: '2026-03-01T08:00:00.000Z', source: 'OCR', imageUrl: null, createdAt: '2026-03-01T08:00:00.000Z', meter: { id: 'm1', meterNumber: 'MTR-001' }, createdBy: { id: 'c1', fullName: 'Abebe Kebede', role: 'CUSTOMER' }, tariff: { id: 't1', pricePerCubicMeter: 12.50 }, bill: { id: 'b1', monthYear: '2026-03', amount: 150.00, consumption: 12.00, status: 'PAID', dueDate: '2026-04-01T00:00:00.000Z' } },
+  { id: 'r2', readingValue: 245, readingDate: '2026-03-02T09:00:00.000Z', source: 'OCR', imageUrl: null, createdAt: '2026-03-02T09:00:00.000Z', meter: { id: 'm2', meterNumber: 'MTR-002' }, createdBy: { id: 'c2', fullName: 'Tigist Haile', role: 'CUSTOMER' }, tariff: { id: 't1', pricePerCubicMeter: 12.50 }, bill: { id: 'b2', monthYear: '2026-03', amount: 187.50, consumption: 15.00, status: 'UNPAID', dueDate: '2026-04-02T00:00:00.000Z' } },
+  { id: 'r3', readingValue: 380, readingDate: '2026-03-03T10:00:00.000Z', source: 'OCR', imageUrl: null, createdAt: '2026-03-03T10:00:00.000Z', meter: { id: 'm3', meterNumber: 'MTR-003' }, createdBy: { id: 'c3', fullName: 'Dawit Alemu', role: 'CUSTOMER' }, tariff: { id: 't1', pricePerCubicMeter: 12.50 }, bill: { id: 'b3', monthYear: '2026-03', amount: 275.00, consumption: 22.00, status: 'OVERDUE', dueDate: '2026-03-01T00:00:00.000Z' } },
+  { id: 'r4', readingValue: 95, readingDate: '2026-03-04T11:00:00.000Z', source: 'OCR', imageUrl: null, createdAt: '2026-03-04T11:00:00.000Z', meter: { id: 'm4', meterNumber: 'MTR-004' }, createdBy: { id: 'c4', fullName: 'Selam Worku', role: 'CUSTOMER' }, tariff: { id: 't1', pricePerCubicMeter: 12.50 }, bill: { id: 'b4', monthYear: '2026-03', amount: 112.50, consumption: 9.00, status: 'UNPAID', dueDate: '2026-04-04T00:00:00.000Z' } },
+  { id: 'r5', readingValue: 510, readingDate: '2026-03-05T12:00:00.000Z', source: 'OCR', imageUrl: null, createdAt: '2026-03-05T12:00:00.000Z', meter: { id: 'm5', meterNumber: 'MTR-005' }, createdBy: { id: 'c6', fullName: 'Kalkidan Mesfin', role: 'CUSTOMER' }, tariff: { id: 't1', pricePerCubicMeter: 12.50 }, bill: { id: 'b5', monthYear: '2026-03', amount: 200.00, consumption: 16.00, status: 'ESCALATED', dueDate: '2026-01-05T00:00:00.000Z' } },
+];
+
+export const MOCK_BILLS = [
+  { id: 'b1', monthYear: '2026-03', amount: 150.00, originalAmount: 150.00, penaltyAmount: 0, penaltyCount: 0, penaltyApplied: false, consumption: 12.00, status: 'PAID', dueDate: '2026-04-01T00:00:00.000Z', createdAt: '2026-03-01T00:00:00.000Z', updatedAt: '2026-03-15T00:00:00.000Z', customer: { id: 'c1', fullName: 'Abebe Kebede', email: 'abebe@gmail.com', phoneE164: '+251912345690', paymentFlag: 'NONE', woreda: { id: 'w1', name: 'Woreda 01' } }, meterReading: { id: 'r1', readingValue: 120, readingDate: '2026-03-01T08:00:00.000Z', source: 'OCR', imageUrl: null }, processedBy: { id: 'o1', fullName: 'Dawit Bekele', role: 'FIELD_OFFICER' }, payment: { id: 'p1', amount: 150.00, status: 'COMPLETED', paymentDate: '2026-03-15T00:00:00.000Z' } },
+  { id: 'b2', monthYear: '2026-03', amount: 187.50, originalAmount: 187.50, penaltyAmount: 0, penaltyCount: 0, penaltyApplied: false, consumption: 15.00, status: 'UNPAID', dueDate: '2026-04-02T00:00:00.000Z', createdAt: '2026-03-02T00:00:00.000Z', updatedAt: '2026-03-02T00:00:00.000Z', customer: { id: 'c2', fullName: 'Tigist Haile', email: 'tigist@gmail.com', phoneE164: '+251912345691', paymentFlag: 'WARNING', woreda: { id: 'w1', name: 'Woreda 01' } }, meterReading: { id: 'r2', readingValue: 245, readingDate: '2026-03-02T09:00:00.000Z', source: 'OCR', imageUrl: null }, processedBy: null, payment: null },
+  { id: 'b3', monthYear: '2026-03', amount: 302.50, originalAmount: 275.00, penaltyAmount: 27.50, penaltyCount: 1, penaltyApplied: true, consumption: 22.00, status: 'OVERDUE', dueDate: '2026-03-01T00:00:00.000Z', createdAt: '2026-02-01T00:00:00.000Z', updatedAt: '2026-03-01T00:00:00.000Z', customer: { id: 'c3', fullName: 'Dawit Alemu', email: 'dawit@gmail.com', phoneE164: '+251912345692', paymentFlag: 'LEGAL_ACTION', woreda: { id: 'w1', name: 'Woreda 01' } }, meterReading: { id: 'r3', readingValue: 380, readingDate: '2026-03-03T10:00:00.000Z', source: 'OCR', imageUrl: null }, processedBy: null, payment: null },
+  { id: 'b4', monthYear: '2026-03', amount: 112.50, originalAmount: 112.50, penaltyAmount: 0, penaltyCount: 0, penaltyApplied: false, consumption: 9.00, status: 'UNPAID', dueDate: '2026-04-04T00:00:00.000Z', createdAt: '2026-03-04T00:00:00.000Z', updatedAt: '2026-03-04T00:00:00.000Z', customer: { id: 'c4', fullName: 'Selam Worku', email: 'selam@gmail.com', phoneE164: '+251912345693', paymentFlag: 'NONE', woreda: { id: 'w1', name: 'Woreda 01' } }, meterReading: { id: 'r4', readingValue: 95, readingDate: '2026-03-04T11:00:00.000Z', source: 'OCR', imageUrl: null }, processedBy: null, payment: null },
+  { id: 'b5', monthYear: '2026-03', amount: 260.00, originalAmount: 200.00, penaltyAmount: 60.00, penaltyCount: 3, penaltyApplied: true, consumption: 16.00, status: 'ESCALATED', dueDate: '2026-01-05T00:00:00.000Z', createdAt: '2026-01-05T00:00:00.000Z', updatedAt: '2026-03-05T00:00:00.000Z', customer: { id: 'c6', fullName: 'Kalkidan Mesfin', email: 'kalkidan@gmail.com', phoneE164: '+251912345695', paymentFlag: 'LEGAL_ACTION', woreda: { id: 'w1', name: 'Woreda 01' } }, meterReading: { id: 'r5', readingValue: 510, readingDate: '2026-03-05T12:00:00.000Z', source: 'OCR', imageUrl: null }, processedBy: null, payment: null },
+];
