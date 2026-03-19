@@ -1,0 +1,1360 @@
+// Monolithic Prisma schema generated from prisma/base.prisma, prisma/enums.prisma, and prisma/models/*.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  SUBCITY_ADMIN
+
+  SUBCITY_BILLING_OFFICER
+  SUBCITY_COMPLAINT_OFFICER
+
+  WOREDA_BILLING_OFFICER
+  WOREDA_COMPLAINT_OFFICER
+  WOREDA_ADMINS
+  FIELD_OFFICER
+  CUSTOMER
+  MANUAL_METER_READER
+}
+
+enum FieldOfficerType {
+  MANUAL_METER_READER
+  PLUMBER
+  TECHNICIAN
+  MAINTENANCE
+  INSPECTOR
+}
+
+enum CustomerType {
+  RESIDENTIAL
+  COMMERCIAL
+  GOVERNMENTAL
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum MeterStatus {
+  ACTIVE
+  DISCONNECTED
+  DAMAGED
+}
+
+enum BillStatus {
+  UNPAID
+  OVERDUE
+  PAID
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CHAPA
+  TELEBIRR
+  BANK_TRANSFER
+}
+
+enum ComplaintCategory {
+  BILLING
+  WATER_SUPPLY
+  NO_WATER
+  LOW_PRESSURE
+  LEAKAGE
+  PIPE_DAMAGE
+  TAP_DAMAGE
+  POLLUTED_WATER
+  METER_DAMAGE
+  OTHER
+}
+
+enum ComplaintStatus {
+  PENDING
+  IN_PROGRESS
+  ESCALATED
+  RESOLVED
+  REJECTED
+}
+
+enum ComplaintPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum NotificationType {
+  BILL_GENERATED
+  PAYMENT_CONFIRMATION
+  PAYMENT_REMINDER
+  COMPLAINT_UPDATE
+  SCHEDULE_CHANGE
+  OUTAGE_ALERT
+  MAINTENANCE_NOTICE
+  OCR_WINDOW_OPEN
+  OCR_WINDOW_CLOSED
+  SYSTEM_ANNOUNCEMENT
+  OTHER
+}
+
+enum DeliveryChannel {
+  EMAIL
+  SMS
+  IN_APP
+}
+
+enum AuditAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+
+  PAYMENT
+  OCR_WINDOW_OPENED
+  OCR_WINDOW_CLOSED
+  OCR_SCAN
+
+  COMPLAINT_CREATE
+  COMPLAINT_UPDATE
+  COMPLAINT_ESCALATE
+
+  BILL_GENERATE
+  SCHEDULE_UPDATE
+  TARIFF_UPDATE
+
+  USER_REGISTRATION
+  ROLE_CHANGE
+  COMPLAINT_MEDIA_UPLOAD
+  MESSAGE_SENT
+  ANNOUNCEMENT_CREATE
+}
+
+enum AnnouncementType {
+  GENERAL
+  EMERGENCY
+  OUTAGE
+  MAINTENANCE
+  BILLING
+}
+
+enum AnnouncementPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ReportType {
+  REVENUE
+  CONSUMPTION
+  COMPLAINTS
+  COLLECTION
+  DISCONNECTIONS
+}
+
+enum ReportPeriodType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum DisconnectionStatus {
+  PENDING
+  DISCONNECTED
+  RECONNECTED
+}
+
+enum ResourceType {
+  VIDEO
+  PDF
+  LINK
+  CSV
+  EXCEL
+}
+
+enum ResourceAudience {
+  CUSTOMER
+  OFFICERS
+  ALL
+}
+
+enum AnnouncementAudience {
+  //  Target by roles
+  ALL
+  CUSTOMERS
+  FIELD_OFFICERS
+
+  SUBCITY_ADMINS
+  SUBCITY_BILLING_OFFICERS
+  SUBCITY_COMPLAINT_OFFICERS
+  WOREDA_ADMINS
+  WOREDA_BILLING_OFFICERS
+  WOREDA_COMPLAINT_OFFICERS
+}
+
+enum InfrastructureImpactLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum InfrastructureProjectType {
+  CORRIDOR
+  PIPE_REPLACEMENT
+  ROAD_EXPANSION
+  MAINTENANCE
+  OTHER
+}
+
+enum ConsumptionAnomalyType {
+  SPIKE
+  DROP
+  ZERO_USAGE
+}
+
+enum ReadingMode {
+  OCR
+  MANUAL
+}
+
+enum ReadingSource {
+  OCR
+  MANUAL
+}
+
+enum WeekDay {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
+model Announcement {
+  id String @id @default(uuid())
+
+  // Superadmin can send global announcements (subCityId null)
+  subCityId String?
+  subCity   SubCity? @relation(fields: [subCityId], references: [id], onDelete: SetNull)
+
+  // optional: for specific woreda targeting
+  targetWoredaIds String[]
+
+  type     AnnouncementType     @default(GENERAL)
+  priority AnnouncementPriority @default(MEDIUM)
+
+  title     Json
+  message   Json
+  mediaUrls String[]
+  isActive  Boolean  @default(true)
+
+  // If true => send to everyone in target scope
+  isBroadcast Boolean @default(false)
+
+  // Role targeting
+  audience AnnouncementAudience @default(ALL)
+
+  // Specific users (only used when isBroadcast=false)
+  targetUserIds String[]
+
+  createdById String?
+  createdBy   User?   @relation("AnnouncementCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  reads AnnouncementRead[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subCityId])
+  @@index([isActive])
+  @@index([type])
+  @@index([priority])
+}
+
+model AnnouncementRead {
+  id String @id @default(uuid())
+
+  announcementId String
+  userId         String
+  readAt         DateTime @default(now())
+
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId])
+  @@index([announcementId])
+  @@index([userId])
+}
+
+model AuditLog {
+  id String @id @default(uuid())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  action AuditAction
+
+  entity   String?
+  entityId String?
+
+  description String?
+
+  oldData Json?
+  newData Json?
+
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model Bill {
+  id String @id @default(uuid())
+
+  billNumber String @unique
+
+  meterId String
+  meter   Meter  @relation(fields: [meterId], references: [id], onDelete: Restrict)
+
+  readingId String       @unique
+  reading   MeterReading @relation(fields: [readingId], references: [id], onDelete: Restrict)
+
+  customerId String?
+  customer   User?   @relation("CustomerBills", fields: [customerId], references: [id], onDelete: SetNull)
+
+  subCityId String
+  subCity   SubCity? @relation(fields: [subCityId], references: [id], onDelete: Restrict)
+
+  billMonth    Int
+  billYear     Int
+  customerType CustomerType @default(RESIDENTIAL)
+
+  billingDate DateTime @default(now())
+
+  previousValue Int
+  currentValue  Int
+  consumption   Int
+
+  tariffId String?
+  tariff   Tariff? @relation(fields: [tariffId], references: [id], onDelete: SetNull)
+
+  // base amount before penalty
+  amount Decimal @db.Decimal(18, 2)
+
+  lateDays          Int     @default(0)
+  latePenaltyAmount Decimal @default(0) @db.Decimal(18, 2)
+
+  totalAmount Decimal @db.Decimal(18, 2)
+
+  paidAmount Decimal @default(0) @db.Decimal(18, 2)
+
+  status BillStatus @default(UNPAID)
+
+  generatedAt DateTime @default(now())
+  dueDate     DateTime
+
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([meterId])
+  @@index([customerId])
+  @@index([subCityId])
+  @@index([customerType])
+  @@index([status])
+  @@index([billYear, billMonth])
+  @@index([dueDate])
+}
+
+model BillingOfficerAssignment {
+  id String @id @default(uuid())
+
+  subCityId String
+  subCity   SubCity @relation(fields: [subCityId], references: [id], onDelete: Cascade)
+
+  // null => subcity level officer
+  woredaId String?
+  woreda   Woreda? @relation(fields: [woredaId], references: [id], onDelete: Cascade)
+
+  officerId String
+  officer   User   @relation("BillingOfficerAssignments", fields: [officerId], references: [id], onDelete: Cascade)
+
+  isSubCityLevel Boolean @default(false)
+  isActive       Boolean @default(true)
+
+  assignedById String?
+  assignedBy   User?   @relation("BillingAssignedByAdmin", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Officer can be assigned to MANY woredas.
+  // But only once per woreda.
+  @@unique([woredaId, officerId])
+  @@index([subCityId])
+  @@index([woredaId])
+  @@index([officerId])
+  @@index([isActive])
+}
+
+model Complaint {
+  id String @id @default(uuid())
+
+  customerId String
+  customer   User   @relation("CustomerComplaints", fields: [customerId], references: [id], onDelete: Cascade)
+
+  subCityId String
+  subCity   SubCity? @relation(fields: [subCityId], references: [id], onDelete: Restrict)
+
+  woredaId String?
+  woreda   Woreda? @relation(fields: [woredaId], references: [id], onDelete: SetNull)
+
+  // Assigned complaint officer
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedComplaints", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  // Assigned field officer
+  assignedFieldOfficerId String?
+  assignedFieldOfficer   User?   @relation("FieldAssignedComplaints", fields: [assignedFieldOfficerId], references: [id], onDelete: SetNull)
+
+  category ComplaintCategory
+  status   ComplaintStatus   @default(PENDING)
+  priority ComplaintPriority @default(MEDIUM)
+
+  // escalation
+  escalatedToId String?
+  // Multilingual
+  title         Json
+  description   Json
+
+  location  String?
+  mediaUrls String[]
+
+  // Escalation
+  escalatedById    String?
+  escalatedBy      User?     @relation("EscalatedComplaints", fields: [escalatedById], references: [id], onDelete: SetNull)
+  escalatedTo      User?     @relation("EscalatedToOfficer", fields: [escalatedToId], references: [id], onDelete: SetNull)
+  escalatedAt      DateTime?
+  escalationReason String?
+
+  // Resolution
+  resolutionNotes String?
+  resolvedAt      DateTime?
+  resolvedById    String?
+  resolvedBy      User?            @relation("ResolvedComplaints", fields: [resolvedById], references: [id], onDelete: SetNull)
+  complaintMedia  ComplaintMedia[]
+  deletedAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([assignedToId])
+  @@index([assignedFieldOfficerId])
+  @@index([status])
+  @@index([priority])
+  @@index([category])
+  @@index([subCityId])
+  @@index([woredaId])
+  @@index([escalatedAt])
+  @@index([escalatedToId])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model ComplaintMedia {
+  id String @id @default(uuid())
+
+  complaintId String
+  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+
+  url  String
+  type ResourceType
+
+  uploadedById String?
+  uploadedBy   User?   @relation("UploadedBy", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([complaintId])
+  @@index([uploadedById])
+}
+
+model ComplaintOfficerAssignment {
+  id String @id @default(uuid())
+
+  subCityId String
+  subCity   SubCity @relation(fields: [subCityId], references: [id], onDelete: Cascade)
+
+  // null => subcity level officer
+  woredaId String?
+  woreda   Woreda? @relation(fields: [woredaId], references: [id], onDelete: Cascade)
+
+  officerId String
+  officer   User   @relation("ComplaintOfficerAssignments", fields: [officerId], references: [id], onDelete: Cascade)
+
+  isSubCityLevel Boolean @default(false)
+  isActive       Boolean @default(true)
+
+  assignedById String?
+  assignedBy   User?   @relation("ComplaintAssignedByAdmin", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Officer can be assigned to MANY woredas.
+  // But only once per woreda.
+  @@unique([woredaId, officerId])
+  @@index([subCityId])
+  @@index([woredaId])
+  @@index([officerId])
+  @@index([isActive])
+}
+
+model ConsumptionAnomaly {
+  id String @id @default(uuid())
+
+  meterId String
+  meter   Meter  @relation(fields: [meterId], references: [id], onDelete: Cascade)
+
+  readingId String
+  reading   MeterReading @relation(fields: [readingId], references: [id], onDelete: Cascade)
+
+  anomalyType ConsumptionAnomalyType
+  confidence  Float
+
+  reviewed Boolean @default(false)
+
+  reviewedById String?
+  reviewedBy   User?   @relation("AnomalyReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  reviewNotes String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([readingId, anomalyType])
+  @@index([meterId])
+  @@index([readingId])
+  @@index([reviewed])
+  @@index([createdAt])
+}
+
+model Disconnection {
+  id String @id @default(uuid())
+
+  userId  String
+  meterId String
+  reason  String
+
+  disconnectionDate        DateTime
+  expectedReconnectionDate DateTime?
+  actualReconnectionDate   DateTime?
+
+  status DisconnectionStatus @default(PENDING)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meter Meter @relation(fields: [meterId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([meterId])
+  @@index([status])
+}
+
+model FieldOfficerWoredaAssignment {
+  id String @id @default(uuid())
+
+  subCityId String
+  subCity   SubCity @relation(fields: [subCityId], references: [id], onDelete: Cascade)
+
+  woredaId String
+  woreda   Woreda @relation(fields: [woredaId], references: [id], onDelete: Cascade)
+
+  officerId String
+  officer   User   @relation("FieldOfficerAssignments", fields: [officerId], references: [id], onDelete: Cascade)
+
+  isActive Boolean @default(true)
+
+  assignedById String?
+  assignedBy   User?   @relation("FieldOfficerAssignedByAdmin", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Only one record for the same officer + woreda.
+  @@unique([woredaId, officerId])
+  @@index([subCityId])
+  @@index([woredaId])
+  @@index([officerId])
+  @@index([isActive])
+}
+
+model InfrastructureProject {
+  id String @id @default(uuid())
+
+  // created by superadmin or subcity admin
+  createdById String?
+  createdBy   User?   @relation("InfrastructureProjectsCreated", fields: [createdById], references: [id], onDelete: SetNull)
+
+  name        String
+  projectType InfrastructureProjectType
+
+  // If null => global project
+  subCityId String?
+  subCity   SubCity? @relation(fields: [subCityId], references: [id], onDelete: SetNull)
+
+  // Optional: affected woredas
+  affectedWoredaIds String[]
+
+  startDate DateTime
+  endDate   DateTime?
+
+  impactLevel InfrastructureImpactLevel
+
+  description String?
+
+  schedules WaterSchedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subCityId])
+  @@index([projectType])
+  @@index([impactLevel])
+  @@index([startDate, endDate])
+}
+
+model ManualMeterReaderAssignment {
+  id String @id @default(uuid())
+
+  subCityId String
+  subCity   SubCity @relation(fields: [subCityId], references: [id], onDelete: Cascade)
+
+  woredaId String
+  woreda   Woreda @relation(fields: [woredaId], references: [id], onDelete: Cascade)
+
+  readerId String
+  reader   User   @relation("ManualReaderAssignments", fields: [readerId], references: [id], onDelete: Cascade)
+
+  isActive Boolean @default(true)
+
+  assignedById String?
+  assignedBy   User?   @relation("ManualReaderAssignedByAdmin", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([woredaId, readerId])
+  @@index([subCityId])
+  @@index([woredaId])
+  @@index([readerId])
+}
+
+model Message {
+  id       String @id @default(uuid())
+  senderId String
+  sender   User   @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+
+  receiverId String
+  receiver   User   @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  text      String?
+  mediaUrls String[] // optional media attachments
+  type      ResourceType @default(LINK) // IMAGE, VIDEO, LINK, PDF
+
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model Meter {
+  id          String      @id @default(uuid())
+  meterNumber String      @unique
+  status      MeterStatus @default(ACTIVE)
+
+  subCityId             String
+  subCity               SubCity @relation(fields: [subCityId], references: [id], onDelete: Restrict)
+  woredaId              String?
+  woreda                Woreda? @relation(fields: [woredaId], references: [id], onDelete: SetNull)
+  //  // 🔥 NEW: ownership verification data
+  registeredNationalId  String?
+  registeredFullName    String?
+  registeredHouseNumber String?
+
+  // Who registered this meter physically
+  registeredById String?
+  registeredBy   User?   @relation("MeterRegisteredBy", fields: [registeredById], references: [id], onDelete: SetNull)
+
+  registeredAt DateTime?
+
+  // 1 meter -> 1 customer
+  customerId String?
+  customer   User?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  isLocked Boolean   @default(false)
+  lockedAt DateTime?
+
+  lastReading     Int?
+  lastReadingDate DateTime?
+
+  meterLabelImageUrl String?
+
+  readings       MeterReading[]
+  bills          Bill[]
+  disconnections Disconnection[]
+  anomalies      ConsumptionAnomaly[]
+
+  installedAt DateTime?
+
+  deletedAt             DateTime?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  MeterOwnershipHistory MeterOwnershipHistory[]
+
+  @@index([subCityId])
+  @@index([woredaId])
+  @@index([status])
+  @@index([registeredNationalId])
+  @@index([isLocked])
+  @@index([deletedAt])
+  @@index([customerId])
+}
+
+model MeterOwnershipHistory {
+  id        String    @id @default(uuid())
+  meterId   String
+  meter     Meter     @relation(fields: [meterId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+
+  @@index([meterId])
+  @@index([userId])
+}
+
+model MeterReading {
+  id String @id @default(uuid())
+
+  meterId String
+  meter   Meter  @relation(fields: [meterId], references: [id], onDelete: Cascade)
+
+  readingValue Int
+  readingDate  DateTime @default(now())
+
+  readingMonth Int
+  readingYear  Int
+
+  // OCR raw texts
+  ocrReadingText     String?
+  ocrMeterNumberText String?
+
+  // OCR cleaned results
+  detectedMeterNumber String?
+  detectedReading     Int?
+
+  ocrConfidence Float?
+  meterMatched  Boolean @default(false)
+
+  imageUrl String?
+
+  isAdjusted   Boolean   @default(false)
+  adjustedById String?
+  adjustedBy   User?     @relation("AdjustedReadings", fields: [adjustedById], references: [id], onDelete: SetNull)
+  adjustedAt   DateTime?
+
+  isBilled Boolean   @default(false)
+  billedAt DateTime?
+
+  submittedById String?
+  submittedBy   User?         @relation("SubmittedReadings", fields: [submittedById], references: [id], onDelete: SetNull)
+  // NEW: how reading was submitted
+  source        ReadingSource @default(OCR)
+
+  // For manual entry
+  enteredByManualReaderId String?
+  enteredByManualReader   User?   @relation("ManualEnteredReadings", fields: [enteredByManualReaderId], references: [id], onDelete: SetNull)
+
+  bill Bill?
+
+  anomalies ConsumptionAnomaly[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // User   User?   @relation(fields: [userId], references: [id])
+  // userId String?
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@unique([meterId, readingMonth, readingYear])
+  @@index([meterId])
+  @@index([ocrConfidence])
+  @@index([readingYear, readingMonth])
+  @@index([isBilled])
+  @@index([meterMatched])
+  @@index([readingDate])
+}
+
+model Notification {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type NotificationType
+
+  title   Json
+  message Json
+  data    Json?
+
+  isRead Boolean @default(false)
+  isSent Boolean @default(false)
+
+  sentVia DeliveryChannel[]
+
+  providerMessageId String?
+  failureReason     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([type])
+  @@index([isRead])
+  @@index([isSent])
+}
+
+model OCRWindow {
+  id String @id @default(uuid())
+
+  subCityId String
+  subCity   SubCity @relation(fields: [subCityId], references: [id], onDelete: Cascade)
+
+  month Int
+  year  Int
+
+  openDate  DateTime
+  closeDate DateTime
+
+  isLateWindow Boolean @default(false)
+  isActive     Boolean @default(false)
+
+  openedById String?
+  openedBy   User?   @relation("OCRWindowOpenedBy", fields: [openedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([subCityId, month, year, isLateWindow])
+  @@index([subCityId])
+  @@index([year, month])
+  @@index([isActive])
+}
+
+model PasswordReset {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String // hashed reset code
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usedAt    DateTime? // optional, for auditing
+
+  @@index([tokenHash])
+  @@index([expiresAt])
+}
+
+model Payment {
+  id String @id @default(uuid())
+
+  billId String
+  bill   Bill   @relation(fields: [billId], references: [id], onDelete: Cascade)
+
+  customerId String?
+  customer   User?   @relation("CustomerPayments", fields: [customerId], references: [id], onDelete: SetNull)
+
+  subCityId String
+  subCity   SubCity? @relation(fields: [subCityId], references: [id], onDelete: Restrict)
+
+  amount Decimal       @db.Decimal(18, 2)
+  method PaymentMethod
+  status PaymentStatus @default(PENDING)
+
+  transactionId   String? @unique
+  referenceNumber String?
+
+  // gateway returns error message sometimes.
+  // backend can see it
+  failureReason String?
+
+  initiatedAt DateTime  @default(now())
+  paidAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // SubCity   SubCity  @relation(fields: [subCityId], references: [id])
+
+  @@index([paidAt])
+  @@index([billId])
+  @@index([status])
+  @@index([method])
+  @@index([customerId])
+  @@index([subCityId])
+  @@index([initiatedAt])
+}
+
+model Report {
+  id String @id @default(uuid())
+
+  subCityId String?
+  subCity   SubCity? @relation(fields: [subCityId], references: [id], onDelete: SetNull)
+
+  reportType ReportType
+  periodType ReportPeriodType
+
+  startDate DateTime
+  endDate   DateTime
+
+  data    Json
+  summary Json?
+
+  generatedById String?
+  generatedBy   User?   @relation("ReportGeneratedBy", fields: [generatedById], references: [id], onDelete: SetNull)
+
+  // for exports
+  availableFormats ResourceType[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subCityId])
+  @@index([reportType])
+  @@index([periodType])
+  @@index([startDate, endDate])
+}
+
+model SubCity {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  isActive    Boolean @default(true)
+
+  cityId  String?
+  adminId String?
+  admin   User?   @relation("SubCityAdmin", fields: [adminId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  woredas       Woreda[]
+  users         User[]
+  meters        Meter[]
+  schedules     WaterSchedule[]
+  announcements Announcement[]
+
+  ocrWindows OCRWindow[]
+  reports    Report[]
+
+  readingMode          ReadingMode           @default(OCR)
+  complaints           Complaint[]
+  bills                Bill[]
+  payments             Payment[]
+  pendingRegistrations PendingRegistration[]
+
+  billingOfficerAssignments   BillingOfficerAssignment[]
+  complaintOfficerAssignments ComplaintOfficerAssignment[]
+
+  fieldOfficerWoredaAssignments FieldOfficerWoredaAssignment[]
+
+  infrastructureProjects      InfrastructureProject[]
+  trainingSessions            TrainingSession[]
+  manualMeterReaderAssignment ManualMeterReaderAssignment[]
+
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model SystemResource {
+  id String @id @default(uuid())
+
+  type     ResourceType
+  audience ResourceAudience @default(ALL)
+
+  title       Json
+  description Json?
+  url         String
+
+  isActive Boolean @default(true)
+
+  createdById String?
+  createdBy   User?   @relation("ResourceCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([audience])
+  @@index([isActive])
+}
+
+model Tariff {
+  id String @id @default(uuid())
+
+  name         String
+  isActive     Boolean      @default(false)
+  customerType CustomerType @default(RESIDENTIAL)
+
+  // late payment policy (percentage per day)
+  latePenaltyPerDayPercent Float @default(0)
+
+  // service fee / fixed charge (optional)
+  fixedMonthlyFee Float @default(0)
+
+  createdById String?
+  createdBy   User?   @relation("TariffCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  blocks TariffBlock[]
+  bills  Bill[]
+
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+
+  version Int @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([version])
+  @@index([isActive])
+  @@index([customerType, isActive])
+}
+
+model TariffBlock {
+  id String @id @default(uuid())
+
+  tariffId String
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
+
+  // Tiered pricing
+  // Example:
+  // 0-5 m3  => 5 birr/m3
+  // 6-10 m3 => 8 birr/m3
+  // 11+ m3  => 12 birr/m3
+  fromM3     Int
+  toM3       Int?
+  pricePerM3 Decimal @db.Decimal(18, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tariffId, fromM3])
+  @@index([tariffId])
+}
+
+model TrainingAttendance {
+  id String @id @default(uuid())
+
+  sessionId String
+  session   TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  attendedAt DateTime @default(now())
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+}
+
+model TrainingSession {
+  id String @id @default(uuid())
+
+  // optional scope
+  subCityId String?
+  subCity   SubCity? @relation(fields: [subCityId], references: [id], onDelete: SetNull)
+
+  title       Json
+  description Json?
+
+  date     DateTime
+  location String?
+
+  feedback Json?
+
+  createdById String?
+  createdBy   User?   @relation("TrainingCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  attendees TrainingAttendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subCityId])
+  @@index([date])
+}
+
+model User {
+  id String @id @default(uuid())
+
+  // LOGIN (REQUIRED)
+  phoneE164 String @unique // +251912440673
+
+  nationalId   String @unique
+  passwordHash String
+
+  // CUSTOMER only: 1 user -> 1 meter
+  // meter           Meter? // optional
+  meters          Meter[]
+  email           String    @unique
+  fullName        String
+  profileImageUrl String?
+  emailVerified   Boolean   @default(false)
+  otp             String?
+  otpExpiry       DateTime?
+
+  // Address
+  houseNumber String?
+  // kebele      String
+
+  role             UserRole
+  fieldOfficerType FieldOfficerType?
+  status           AccountStatus     @default(ACTIVE)
+
+  lastLoginAt DateTime?
+
+  // Location
+  subCityId String
+  subCity   SubCity? @relation(fields: [subCityId], references: [id], onDelete: Restrict)
+
+  woredaId String?
+  woreda   Woreda? @relation(fields: [woredaId], references: [id], onDelete: SetNull)
+
+  // Preferences (sync across devices)
+  preference UserPreference?
+
+  // Complaints
+  complaints                    Complaint[]                  @relation("CustomerComplaints")
+  assignedComplaints            Complaint[]                  @relation("AssignedComplaints")
+  fieldAssignedComplaints       Complaint[]                  @relation("FieldAssignedComplaints")
+  escalatedComplaints           Complaint[]                  @relation("EscalatedComplaints")
+  resolvedComplaints            Complaint[]                  @relation("ResolvedComplaints")
+  billingOfficerAssignments     BillingOfficerAssignment[]   @relation("BillingOfficerAssignments")
+  // meter reading relations
+  infrastructureProjectsCreated InfrastructureProject[]      @relation("InfrastructureProjectsCreated")
+  complaintOfficerAssignments   ComplaintOfficerAssignment[] @relation("ComplaintOfficerAssignments")
+  adjustedReadings              MeterReading[]               @relation("AdjustedReadings")
+  submittedReadings             MeterReading[]               @relation("SubmittedReadings")
+
+  // Bills / Payments
+  bills    Bill[]    @relation("CustomerBills")
+  payments Payment[] @relation("CustomerPayments")
+
+  // notifications / audit
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  managedSubCities SubCity[] @relation("SubCityAdmin")
+
+  createdBillingAssignments      BillingOfficerAssignment[]     @relation("BillingAssignedByAdmin")
+  createdComplaintAssignments    ComplaintOfficerAssignment[]   @relation("ComplaintAssignedByAdmin")
+  createdFieldOfficerAssignments FieldOfficerWoredaAssignment[] @relation("FieldOfficerAssignedByAdmin")
+
+  announcementReads AnnouncementRead[]
+  disconnections    Disconnection[]
+
+  createdSchedules     WaterSchedule[]  @relation("ScheduleCreatedBy")
+  createdAnnouncements Announcement[]   @relation("AnnouncementCreatedBy")
+  generatedReports     Report[]         @relation("ReportGeneratedBy")
+  createdTariffs       Tariff[]         @relation("TariffCreatedBy")
+  openedOCRWindows     OCRWindow[]      @relation("OCRWindowOpenedBy")
+  createdResources     SystemResource[] @relation("ResourceCreatedBy")
+
+  fieldOfficerWoredas FieldOfficerWoredaAssignment[] @relation("FieldOfficerAssignments")
+
+  // for manual meter readers
+  manualReaderAssignments        ManualMeterReaderAssignment[] @relation("ManualReaderAssignments")
+  createdManualReaderAssignments ManualMeterReaderAssignment[] @relation("ManualReaderAssignedByAdmin")
+
+  manualEnteredReadings   MeterReading[]       @relation("ManualEnteredReadings")
+  // Training
+  trainingAttendances     TrainingAttendance[]
+  createdTrainingSessions TrainingSession[]    @relation("TrainingCreatedBy")
+
+  // Anomaly review
+  reviewedAnomalies ConsumptionAnomaly[] @relation("AnomalyReviewedBy")
+
+  // Soft delete
+  deletedAt DateTime?
+
+  // Escalation
+  escalatedToComplaints Complaint[] @relation("EscalatedToOfficer")
+
+  // For Message relation
+  UploadedBy       ComplaintMedia[] @relation("UploadedBy")
+  messagesSent     Message[]        @relation("MessagesSent")
+  messagesReceived Message[]        @relation("MessagesReceived")
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  MeterReading     MeterReading[]
+  // Meter            Meter[]
+
+  registeredMeters      Meter[]                 @relation("MeterRegisteredBy")
+  PasswordReset         PasswordReset[]
+  MeterOwnershipHistory MeterOwnershipHistory[]
+
+  @@index([role])
+  @@index([status])
+  @@index([subCityId])
+  @@index([woredaId])
+  @@index([deletedAt])
+}
+
+model UserPreference {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // MVP: am + en
+  // scalable: store ISO codes later (om, ti, so, etc.)
+  language String @default("am")
+
+  // UI settings (sync across devices)
+  darkMode    Boolean @default(false)
+  accentColor String?
+
+  // Timezone display
+  timeZone String @default("Africa/Addis_Ababa")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PendingRegistration {
+  id String @id @default(uuid())
+
+  fullName     String
+  phoneE164    String @unique
+  email        String @unique
+  nationalId   String @unique
+  passwordHash String
+  meterNumber  String @unique
+
+  subCityId String
+  subCity   SubCity @relation(fields: [subCityId], references: [id], onDelete: Restrict)
+
+  woredaId String?
+  woreda   Woreda? @relation(fields: [woredaId], references: [id], onDelete: SetNull)
+
+  otp       String
+  otpExpiry DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subCityId])
+  @@index([woredaId])
+}
+
+model WaterSchedule {
+  id String @id @default(uuid())
+
+  subCityId String
+  subCity   SubCity @relation(fields: [subCityId], references: [id], onDelete: Cascade)
+
+  woredaId String?
+  woreda   Woreda? @relation(fields: [woredaId], references: [id], onDelete: SetNull)
+
+  // Schedule is better stored in Gregorian (ISO) for backend.
+  // Ethiopian calendar is calculated on frontend/backend.
+  startAt DateTime
+  endAt   DateTime
+
+  // Optional: recurring schedule
+  isRecurring Boolean  @default(false)
+  // dayOfWeek   Int? // 0-6 (Sun-Sat) if recurring
+  dayOfWeek   WeekDay?
+  // Note is multilingual text for schedule details
+  note        Json?
+
+  createdById String?
+  createdBy   User?   @relation("ScheduleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  // Link to infrastructure project if schedule was affected
+  infrastructureProjectId String?
+  infrastructureProject   InfrastructureProject? @relation(fields: [infrastructureProjectId], references: [id], onDelete: SetNull)
+
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subCityId])
+  @@index([woredaId])
+  @@index([startAt])
+  @@index([endAt])
+  @@index([isRecurring])
+  @@index([dayOfWeek])
+  @@index([deletedAt])
+}
+
+model Woreda {
+  id        String  @id @default(uuid())
+  subCityId String
+  name      String
+  isActive  Boolean @default(true)
+
+  subCity SubCity @relation(fields: [subCityId], references: [id], onDelete: Cascade)
+
+  users                User[]
+  meters               Meter[]
+  schedules            WaterSchedule[]
+  complaints           Complaint[]
+  pendingRegistrations PendingRegistration[]
+
+  billingOfficerAssignments   BillingOfficerAssignment[]
+  complaintOfficerAssignments ComplaintOfficerAssignment[]
+
+  fieldOfficerWoredaAssignments FieldOfficerWoredaAssignment[]
+
+  createdAt                   DateTime                      @default(now())
+  updatedAt                   DateTime                      @updatedAt
+  deletedAt                   DateTime?
+  manualMeterReaderAssignment ManualMeterReaderAssignment[]
+
+  @@unique([subCityId, name])
+  @@index([subCityId])
+  @@index([isActive])
+  @@index([deletedAt])
+}
