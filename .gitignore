@@ -1,0 +1,15 @@
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# Node modules
+node_modules/
+
+# Flutter build files
+build/
+.dart_tool/
+
+# VS Code settings (optional)
+.vscode/
