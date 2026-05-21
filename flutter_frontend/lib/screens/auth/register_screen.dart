@@ -220,61 +220,72 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
         const SizedBox(height: 6),
 
-        TextField(
-          controller: controller,
-          inputFormatters: label == "Phone Number"
-              ? [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(9),
-                ]
-              : label == "National ID (FIN Number)"
-              ? [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(12),
-                ]
-              : label == "Meter Number"
-              ? [FilteringTextInputFormatter.allow(RegExp(r'[A-Z0-9\-]'))]
-              : null,
-          obscureText: obscure,
-          keyboardType: keyboardType,
-          style: GoogleFonts.syne(
-            color: Colors.black,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          height: 56,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFFE5E7EB),
+              width: 1,
+            ),
           ),
-          cursorColor: Colors.black,
-          onChanged: onChanged,
-          decoration: InputDecoration(
-            hintText: hint,
-            errorText: errorText,
-            hintStyle: GoogleFonts.syne(
-              color: const Color(0xFFD1D5DB),
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
-            filled: true,
-            fillColor: const Color(0xffE3F2FD),
-            prefixText: prefixText,
-            prefixStyle: prefixText != null
-                ? GoogleFonts.syne(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  )
-                : null,
-            suffixIcon: suffix,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xff1E90FF), width: 2),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
+          child: Row(
+            children: [
+              const SizedBox(width: 16),
+              if (prefixText == null) ...[],
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  inputFormatters: label == "Phone Number"
+                      ? [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(9),
+                        ]
+                      : label == "National ID (FIN Number)"
+                          ? [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(12),
+                            ]
+                          : label == "Meter Number"
+                              ? [FilteringTextInputFormatter.allow(RegExp(r'[A-Z0-9\-]'))]
+                              : null,
+                  obscureText: obscure,
+                  keyboardType: keyboardType,
+                  style: GoogleFonts.syne(
+                    color: const Color(0xFF1F2937),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  cursorColor: const Color(0xFF1F2937),
+                  onChanged: onChanged,
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    errorText: errorText,
+                    hintStyle: GoogleFonts.syne(
+                      color: const Color(0xFF9CA3AF),
+                      fontSize: 15,
+                    ),
+                    filled: true,
+                    fillColor: const Color(0x00000000),
+                    prefixText: prefixText,
+                    prefixStyle: prefixText != null
+                        ? GoogleFonts.syne(
+                            color: const Color(0xFF1F2937),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          )
+                        : null,
+                    suffixIcon: suffix,
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+            ],
           ),
         ),
 
@@ -694,18 +705,23 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       showSearchBox: true,
                       searchFieldProps: const TextFieldProps(
                         style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
+                          color: Color(0xFF1F2937),
+                          fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
-                        cursorColor: Colors.black,
+                        cursorColor: Color(0xFF1F2937),
                         decoration: InputDecoration(
                           hintText: "Search Sub City",
                           hintStyle: TextStyle(
-                            color: Color(0xFF6B7280),
-                            fontSize: 14,
+                            color: Color(0xFF9CA3AF),
+                            fontSize: 15,
                           ),
                           prefixIcon: Icon(Icons.search),
+                          filled: true,
+                          fillColor: Color(0xFFF9FAFB),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
                         ),
                       ),
                     ),
@@ -715,17 +731,17 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       dropdownSearchDecoration: InputDecoration(
                         hintText: "Select Sub City",
                         hintStyle: const TextStyle(
-                          color: Color(0xFF6B7280),
-                          fontSize: 14,
+                          color: Color(0xFF9CA3AF),
+                          fontSize: 15,
                         ),
                         filled: true,
-                        fillColor: const Color(0xffE6EEF5),
+                        fillColor: const Color(0xFFF9FAFB),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(
                             color: Color(0xff1E90FF),
                             width: 2,
@@ -782,18 +798,23 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       showSearchBox: true,
                       searchFieldProps: const TextFieldProps(
                         style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
+                          color: Color(0xFF1F2937),
+                          fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
-                        cursorColor: Colors.black,
+                        cursorColor: Color(0xFF1F2937),
                         decoration: InputDecoration(
                           hintText: "Search Woreda",
                           hintStyle: TextStyle(
-                            color: Color(0xFF6B7280),
-                            fontSize: 14,
+                            color: Color(0xFF9CA3AF),
+                            fontSize: 15,
                           ),
                           prefixIcon: Icon(Icons.search),
+                          filled: true,
+                          fillColor: Color(0xFFF9FAFB),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
                         ),
                       ),
                     ),
@@ -803,17 +824,17 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       dropdownSearchDecoration: InputDecoration(
                         hintText: "Select Woreda",
                         hintStyle: const TextStyle(
-                          color: Color(0xFF6B7280),
-                          fontSize: 14,
+                          color: Color(0xFF9CA3AF),
+                          fontSize: 15,
                         ),
                         filled: true,
-                        fillColor: const Color(0xffE6EEF5),
+                        fillColor: const Color(0xFFF9FAFB),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(
                             color: Color(0xff1E90FF),
                             width: 2,
