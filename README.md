@@ -4,122 +4,476 @@
 
 ## Overview
 
-This repository contains the AquaConnect admin web app (Next.js), a Node.js backend (Express + Prisma), and a Flutter frontend for mobile access. The project provides tools to manage locations, billing, user authentication, and administrative workflows for city water utilities.
+AquaConnect is a comprehensive water utility management platform designed for city and municipal water service providers. The system consists of:
 
-## Repository structure
+- **Admin Web Portal** built with Next.js for utility staff and administrators.
+- **Backend API** built with Node.js, Express, and Prisma ORM.
+- **Mobile Application** built with Flutter for customers and field personnel.
 
-- `updated backend/` — Node.js backend, Prisma schema, migrations, and server code.
-- `aquaconnect-admin-main/` — Next.js admin web app (React) for administrators and staff.
-- `flutter_frontend/` — Flutter mobile application and platform-specific projects.
-- `build/`, `ios/`, `android/`, etc. — build artifacts and platform outputs (generated).
+The platform streamlines customer management, billing operations, water consumption tracking, authentication, reporting, and administrative workflows.
 
-## Key features
+---
 
-- REST API with authentication (JWT)
-- Prisma ORM with PostgreSQL support
-- Email/OTP flows (SMTP configurable)
-- Admin dashboard (Next.js) consuming the backend API
-- Flutter mobile client (configurable via `--dart-define`)
+## Screenshots
+
+### Admin Dashboard
+
+<img src="screenshots/photo_1_2026-05-21_16-54-49.jpg" width="900" alt="Admin Dashboard">
+
+### Customer Management
+
+<img src="screenshots/photo_2_2026-05-21_16-54-49.jpg" width="900" alt="Customer Management">
+
+### Billing & Payments
+
+<img src="screenshots/photo_3_2026-05-21_16-54-49.jpg" width="900" alt="Billing & Payments">
+
+### Water Account Records
+
+<img src="screenshots/photo_4_2026-05-21_16-54-49.jpg" width="900" alt="Water Account Records">
+
+### Location & Service Area Management
+
+<img src="screenshots/photo_5_2026-05-21_16-54-49.jpg" width="900" alt="Location Management">
+
+### Reports & Analytics
+
+<img src="screenshots/photo_6_2026-05-21_16-54-49.jpg" width="900" alt="Reports and Analytics">
+
+### Mobile Application
+
+<p align="center">
+  <img src="screenshots/photo_7_2026-05-21_16-54-49.jpg" width="220" alt="Mobile App Screen 1">
+  <img src="screenshots/photo_8_2026-05-21_16-54-49.jpg" width="220" alt="Mobile App Screen 2">
+  <img src="screenshots/photo_9_2026-05-21_16-54-50.jpg" width="220" alt="Mobile App Screen 3">
+</p>
+
+### Authentication & Access Control
+
+<img src="screenshots/photo_10_2026-05-21_16-54-50.jpg" width="900" alt="Authentication">
+
+---
+
+## Key Features
+
+### Administration
+
+- User and role management
+- Service area/location management
+- Customer account administration
+- Administrative dashboard and reporting
+
+### Billing System
+
+- Water billing generation
+- Payment tracking and history
+- Outstanding balance monitoring
+- Invoice and billing record management
+
+### Authentication & Security
+
+- JWT-based authentication
+- Refresh token support
+- OTP verification via email
+- Role-based access control
+
+### Mobile Access
+
+- Customer account access
+- Billing information viewing
+- Water account monitoring
+- Mobile-friendly user experience
+
+### Backend Services
+
+- RESTful API architecture
+- Prisma ORM integration
+- PostgreSQL database support
+- Email notification services
+- Secure authentication flows
+
+---
+
+## Repository Structure
+
+```text
+.
+├── updated backend/
+│   ├── prisma/
+│   ├── src/
+│   └── .env.example
+│
+├── aquaconnect-admin-main/
+│   ├── src/
+│   ├── public/
+│   └── .env.example
+│
+├── flutter_frontend/
+│   ├── lib/
+│   ├── android/
+│   ├── ios/
+│   └── .env.example
+│
+└── screenshots/
+    ├── photo_1_2026-05-21_16-54-49.jpg
+    ├── ...
+    └── photo_10_2026-05-21_16-54-50.jpg
+```
+
+---
+
+## Technology Stack
+
+### Backend
+
+- Node.js
+- Express.js
+- Prisma ORM
+- PostgreSQL
+- JWT Authentication
+- Nodemailer
+
+### Frontend (Admin Portal)
+
+- Next.js
+- React
+- TypeScript / JavaScript
+- Tailwind CSS
+
+### Mobile Application
+
+- Flutter
+- Dart
+
+### Database
+
+- PostgreSQL
+
+---
 
 ## Requirements
 
-- Node.js 18+ (or compatible LTS)
+### Backend
+
+- Node.js 18+
 - npm or yarn
 - PostgreSQL 12+
-- Flutter SDK (for mobile app)
 
-## Environment files
+### Mobile App
 
-Place runtime environment variables in `updated backend/.env` (never commit secrets). Example templates are provided as `.env.example` files in the relevant folders. Important variables include:
+- Flutter SDK
+- Android Studio / Xcode
 
-- `DATABASE_URL` — Postgres connection string used by Prisma
-- `JWT_SECRET`, `JWT_REFRESH_SECRET` — JWT signing secrets
-- `EMAIL_*` — SMTP configuration for sending OTP and notifications
-- `NEXT_PUBLIC_API_BASE_URL` — Admin web app API base URL (in `aquaconnect-admin-main/.env.example`)
-- `API_BASE_URL` — Used by the Flutter app via `--dart-define` (see Flutter section)
+---
 
-Do NOT commit `.env` files. Use the provided `*.env.example` files to populate local `.env`.
+## Environment Configuration
 
-## Backend (updated backend) — Setup & run
+Create environment files based on the provided examples.
 
-1. Change to the backend folder:
+### Backend
 
-   cd "updated backend"
+Location:
 
-2. Install dependencies:
+```bash
+updated backend/.env
+```
 
-   npm install
+Important variables:
 
-3. Create a `.env` from the example and set values:
+```env
+DATABASE_URL=
+JWT_SECRET=
+JWT_REFRESH_SECRET=
 
-   cp .env.example .env
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_USER=
+EMAIL_PASS=
+EMAIL_FROM=
+```
 
-   # Edit .env and set DATABASE_URL, JWT secrets, EMAIL credentials, etc.
+### Admin Portal
 
-4. Generate Prisma client and apply migrations:
+Location:
 
-   npx prisma generate
-   npx prisma migrate dev --name init
+```bash
+aquaconnect-admin-main/.env.local
+```
 
-5. Start the server (development):
+Example:
 
-   npm run dev
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5001
+```
 
-The server entrypoint is `updated backend/src/server.js`.
+### Flutter Application
 
-## Admin web app (aquaconnect-admin-main)
+API URL is supplied using Dart defines:
 
-1. Change to the admin app folder:
-
-   cd aquaconnect-admin-main
-
-2. Install dependencies:
-
-   npm install
-
-3. Configure environment variables (use `.env` or `.env.local`). Example available at `aquaconnect-admin-main/.env.example`.
-
-4. Run the app in development:
-
-   npm run dev
-
-The admin app uses `NEXT_PUBLIC_API_BASE_URL` to locate the backend API.
-
-## Flutter app (flutter_frontend)
-
-The Flutter app reads `API_BASE_URL` from compile-time defines. Example run command:
-
+```bash
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5001
+```
 
-Or build with:
+Production:
 
-flutter build apk --dart-define=API_BASE_URL=https://api.example.com
+```bash
+flutter build apk \
+--dart-define=API_BASE_URL=https://api.example.com
+```
 
-An `.env.example` with usage notes is provided in `flutter_frontend/` for reference.
+---
 
-## Database & Prisma
+# Backend Setup
 
-- Prisma schema and migrations live in `updated backend/prisma/`.
-- To interact with the database use `npx prisma studio` or `npx prisma migrate dev`.
-- Ensure `DATABASE_URL` in the backend `.env` points to a running Postgres instance.
+Navigate to backend:
+
+```bash
+cd "updated backend"
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create environment file:
+
+```bash
+cp .env.example .env
+```
+
+Generate Prisma client:
+
+```bash
+npx prisma generate
+```
+
+Run migrations:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+Start development server:
+
+```bash
+npm run dev
+```
+
+Server entry point:
+
+```text
+updated backend/src/server.js
+```
+
+---
+
+# Admin Portal Setup
+
+Navigate to admin application:
+
+```bash
+cd aquaconnect-admin-main
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Configure environment variables.
+
+Start development server:
+
+```bash
+npm run dev
+```
+
+Default URL:
+
+```text
+http://localhost:3000
+```
+
+---
+
+# Flutter Application Setup
+
+Navigate to Flutter project:
+
+```bash
+cd flutter_frontend
+```
+
+Install packages:
+
+```bash
+flutter pub get
+```
+
+Run application:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5001
+```
+
+Build Android APK:
+
+```bash
+flutter build apk \
+--dart-define=API_BASE_URL=https://api.example.com
+```
+
+Build App Bundle:
+
+```bash
+flutter build appbundle \
+--dart-define=API_BASE_URL=https://api.example.com
+```
+
+---
+
+## Database Management
+
+Prisma schema location:
+
+```text
+updated backend/prisma/schema.prisma
+```
+
+Useful commands:
+
+Generate Prisma client:
+
+```bash
+npx prisma generate
+```
+
+Open Prisma Studio:
+
+```bash
+npx prisma studio
+```
+
+Create migration:
+
+```bash
+npx prisma migrate dev --name migration_name
+```
+
+Deploy migrations:
+
+```bash
+npx prisma migrate deploy
+```
+
+---
 
 ## Testing
 
-- Backend: add and run tests (if present) via `npm test` inside `updated backend`.
-- Frontend: run Next.js tests or typechecks as configured.
+### Backend
 
-## Contributing
+```bash
+npm test
+```
 
-- Open issues for bugs or feature requests.
-- Create pull requests against `main` with clear descriptions and tests where applicable.
-- Do not commit secrets; use `.env.example` files and document required values.
+### Frontend
+
+```bash
+npm run lint
+npm run build
+```
+
+### Flutter
+
+```bash
+flutter test
+```
+
+---
 
 ## Troubleshooting
 
-- Backend cannot connect to DB: verify `DATABASE_URL` and that Postgres accepts connections.
-- Email issues: verify SMTP credentials, host, and that `ENABLE_EMAIL_QUEUE` is set appropriately.
-- Flutter networking on emulator: use `10.0.2.2` for Android emulator to reach a host machine service.
+### Database Connection Issues
 
-## License & Contact
+Verify:
 
-See project maintainers for licensing details. For questions, contact the repository owners or open an issue.
+- PostgreSQL is running
+- `DATABASE_URL` is correct
+- Database credentials are valid
+- Firewall settings allow access
+
+### Email Delivery Issues
+
+Verify:
+
+- SMTP credentials
+- SMTP host and port
+- Sender email configuration
+- Email provider security settings
+
+### Android Emulator Networking
+
+Use:
+
+```text
+10.0.2.2
+```
+
+instead of:
+
+```text
+localhost
+```
+
+when connecting to services running on the host machine.
+
+---
+
+## Contributing
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Commit your changes.
+4. Push your branch.
+5. Open a Pull Request.
+
+Please:
+
+- Follow existing coding conventions.
+- Document new features.
+- Add tests where applicable.
+- Never commit secrets or `.env` files.
+
+---
+
+## Security Notes
+
+- Never commit `.env` files.
+- Rotate JWT secrets regularly.
+- Use HTTPS in production.
+- Restrict database access to trusted networks.
+- Store sensitive credentials securely.
+
+---
+
+## License
+
+This project is maintained by the AquaConnect development team.
+
+Please contact the repository maintainers regarding licensing information.
+
+---
+
+## Contact
+
+For support, feature requests, or bug reports:
+
+- Open an issue in this repository.
+- Contact the project maintainers.
+
+---
+
+Built with ❤️ for modern municipal water utility management.
