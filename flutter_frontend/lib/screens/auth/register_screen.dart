@@ -1047,43 +1047,76 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                   /// Sign In
                   Center(
-                    child: MouseRegion(
-                      onEnter: (_) => setState(() => _signInHover = true),
-                      onExit: (_) => setState(() => _signInHover = false),
-                      cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
-                        onTapDown: (_) {
-                          setState(() => _signInPressed = true);
-                        },
-                        onTapCancel: () {
-                          setState(() => _signInPressed = false);
-                        },
-                        onTapUp: (_) {
-                          setState(() => _signInPressed = false);
-                        },
-                        onTap: _goBackToLogin,
-                        child: RichText(
-                          text: TextSpan(
-                            style: const TextStyle(color: Colors.black),
-                            children: [
-                              const TextSpan(text: "Already have an account? "),
-                              TextSpan(
-                                text: "Sign In",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: (_signInHover || _signInPressed)
-                                      ? const Color(0xFF003A8F)
-                                      : const Color(0xFF3B82F6),
-                                  decoration: (_signInHover || _signInPressed)
-                                      ? TextDecoration.underline
-                                      : TextDecoration.none,
-                                ),
-                              ),
-                            ],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Already have an account? ",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF111827),
                           ),
                         ),
-                      ),
+                        MouseRegion(
+                          onEnter: (_) => setState(() => _signInHover = true),
+                          onExit: (_) => setState(() => _signInHover = false),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTapDown: (_) {
+                              setState(() {
+                                _signInPressed = true;
+                              });
+                            },
+                            onTapCancel: () {
+                              setState(() {
+                                _signInPressed = false;
+                              });
+                            },
+                            onTapUp: (_) {
+                              setState(() {
+                                _signInPressed = false;
+                              });
+                            },
+                            onTap: _goBackToLogin,
+                            child: AnimatedContainer(
+                              duration: const Duration(
+                                milliseconds: 180,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: (_signInHover || _signInPressed)
+                                    ? const Color(0xFFEAF3FF)
+                                    : const Color(0xFFF8FBFF),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: (_signInHover || _signInPressed)
+                                      ? const Color(0xFF1E88E5)
+                                      : const Color(0xFFBFDBFE),
+                                ),
+                              ),
+                              child: AnimatedDefaultTextStyle(
+                                duration: const Duration(
+                                  milliseconds: 180,
+                                ),
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  color: (_signInHover || _signInPressed)
+                                      ? const Color(0xFF003A8F)
+                                      : const Color(0xFF1E88E5),
+                                  decoration: TextDecoration.none,
+                                ),
+                                child: const Text('Sign In'),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
