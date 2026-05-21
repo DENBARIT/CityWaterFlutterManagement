@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
-import 'package:city_water_flutter/features/home/main.dart' as aqua_home;
+import 'package:city_water_flutter/my_flutter_app/main.dart' as aqua_home;
 import 'package:city_water_flutter/screens/meter_scan_screen.dart';
 import 'package:city_water_flutter/services/announcement_service.dart';
 import 'package:city_water_flutter/services/auth_service.dart';
@@ -2400,6 +2400,21 @@ class _PostSignInPageState extends State<PostSignInPage>
       context: context,
       builder: (dialogContext) {
         var isSubmitting = false;
+      final dialogSurface = _isDarkMode
+        ? const Color(0xFF0F172A)
+        : Colors.white;
+      final dialogTitleColor = _isDarkMode
+        ? Colors.white
+        : const Color(0xFF0F172A);
+      final dialogBodyColor = _isDarkMode
+        ? const Color(0xFFE2E8F0)
+        : const Color(0xFF334155);
+      final fieldFillColor = _isDarkMode
+        ? const Color(0xFF0B1A2B)
+        : const Color(0xFFF8FBFF);
+      final fieldBorderColor = _isDarkMode
+        ? const Color(0xFF334155)
+        : const Color(0xFFBFDBFE);
 
         return StatefulBuilder(
           builder: (context, setModalState) {
@@ -2473,26 +2488,70 @@ class _PostSignInPageState extends State<PostSignInPage>
             }
 
             return AlertDialog(
-              backgroundColor: _isDarkMode
-                  ? _darkSurface
-                  : const Color(0xFF124A86),
-              title: Text(_t('Change Password', 'የይለፍ ቃል ቀይር')),
+              backgroundColor: dialogSurface,
+              title: Text(
+                _t('Change Password', 'የይለፍ ቃል ቀይር'),
+                style: TextStyle(
+                  color: dialogTitleColor,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              contentTextStyle: TextStyle(
+                color: dialogBodyColor,
+                fontSize: 13.5,
+                height: 1.35,
+              ),
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 24,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: newPasswordController,
                     obscureText: true,
+                    style: TextStyle(color: dialogTitleColor),
                     decoration: InputDecoration(
                       labelText: _t('New Password', 'አዲስ የይለፍ ቃል'),
+                      labelStyle: TextStyle(color: dialogBodyColor),
+                      floatingLabelStyle: TextStyle(color: dialogTitleColor),
+                      filled: true,
+                      fillColor: fieldFillColor,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: fieldBorderColor),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                        borderSide:
+                            BorderSide(color: Color(0xFF1E90FF), width: 1.4),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: confirmPasswordController,
                     obscureText: true,
+                    style: TextStyle(color: dialogTitleColor),
                     decoration: InputDecoration(
                       labelText: _t('Confirm Password', 'የይለፍ ቃል አረጋግጥ'),
+                      labelStyle: TextStyle(color: dialogBodyColor),
+                      floatingLabelStyle: TextStyle(color: dialogTitleColor),
+                      filled: true,
+                      fillColor: fieldFillColor,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: fieldBorderColor),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                        borderSide:
+                            BorderSide(color: Color(0xFF1E90FF), width: 1.4),
+                      ),
                     ),
                   ),
                 ],
@@ -2502,17 +2561,31 @@ class _PostSignInPageState extends State<PostSignInPage>
                   onPressed: isSubmitting
                       ? null
                       : () => Navigator.of(dialogContext).pop(),
-                  child: Text(_t('Cancel', 'ተው')),
+                  child: Text(
+                    _t('Cancel', 'ተው'),
+                    style: TextStyle(
+                      color: _isDarkMode
+                          ? const Color(0xFFE2E8F0)
+                          : const Color(0xFF0F172A),
+                    ),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: isSubmitting ? null : submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E90FF),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                   child: isSubmitting
                       ? const SizedBox(
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text(_t('Send OTP', 'OTP ላክ')),
+                      : const Text('Send OTP'),
                 ),
               ],
             );
@@ -2808,7 +2881,9 @@ class _PostSignInPageState extends State<PostSignInPage>
   Widget _buildComplaintsPlaceholder() {
     final cardBg = _isDarkMode ? _darkSurface : Colors.white;
     final textColor = _isDarkMode ? Colors.white : const Color(0xFF0F172A);
-    final bodyColor = _isDarkMode ? _darkMuted : const Color(0xFF475569);
+    final bodyColor = _isDarkMode ? Colors.white : const Color(0xFF475569);
+    final formTextColor = _isDarkMode ? Colors.white : const Color(0xFF0F172A);
+    final formHintColor = _isDarkMode ? Colors.white70 : const Color(0xFF64748B);
 
     const categories = [
       'BILLING',
@@ -3011,27 +3086,67 @@ class _PostSignInPageState extends State<PostSignInPage>
           const SizedBox(height: 14),
           TextField(
             controller: _complaintTitleController,
+            style: TextStyle(color: formTextColor),
             decoration: InputDecoration(
               labelText: _t('Complaint Title', 'የቅሬታ ርዕስ'),
+              labelStyle: TextStyle(color: formTextColor),
+              floatingLabelStyle: TextStyle(color: formTextColor),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: _isDarkMode ? _darkBorder : const Color(0xFFBFDBFE),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF1E90FF),
+                  width: 1.4,
+                ),
+              ),
+              filled: true,
+              fillColor: _isDarkMode ? const Color(0xFF0B1A2B) : Colors.white,
             ),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             initialValue: _selectedComplaintCategory,
+            dropdownColor: _isDarkMode ? _darkSurface : Colors.white,
+            style: TextStyle(color: formTextColor),
             decoration: InputDecoration(
               labelText: _t('Category', 'ምድብ'),
+              labelStyle: TextStyle(color: formTextColor),
+              floatingLabelStyle: TextStyle(color: formTextColor),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: _isDarkMode ? _darkBorder : const Color(0xFFBFDBFE),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF1E90FF),
+                  width: 1.4,
+                ),
+              ),
+              filled: true,
+              fillColor: _isDarkMode ? const Color(0xFF0B1A2B) : Colors.white,
             ),
             items: categories
                 .map(
                   (key) => DropdownMenuItem<String>(
                     value: key,
-                    child: Text(_categoryLabel(key)),
+                    child: Text(
+                      _categoryLabel(key),
+                      style: TextStyle(color: formTextColor),
+                    ),
                   ),
                 )
                 .toList(),
@@ -3049,14 +3164,33 @@ class _PostSignInPageState extends State<PostSignInPage>
             controller: _complaintBodyController,
             minLines: 4,
             maxLines: 7,
+            style: TextStyle(color: formTextColor),
             decoration: InputDecoration(
               hintText: _t(
                 'Describe your complaint in detail...',
                 'ችግኝዎን በዝርዝር ይግለጹ...',
               ),
+              hintStyle: TextStyle(color: formHintColor),
+              labelStyle: TextStyle(color: formTextColor),
+              floatingLabelStyle: TextStyle(color: formTextColor),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: _isDarkMode ? _darkBorder : const Color(0xFFBFDBFE),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF1E90FF),
+                  width: 1.4,
+                ),
+              ),
+              filled: true,
+              fillColor: _isDarkMode ? const Color(0xFF0B1A2B) : Colors.white,
             ),
           ),
           const SizedBox(height: 12),
@@ -3432,7 +3566,7 @@ class _PostSignInPageState extends State<PostSignInPage>
             value,
             style: TextStyle(
               fontSize: 12,
-              color: _isDarkMode ? _darkMuted : bodyColor,
+              color: _isDarkMode ? Colors.white : bodyColor,
             ),
           ),
         ),
@@ -3458,7 +3592,7 @@ class _PostSignInPageState extends State<PostSignInPage>
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: _isDarkMode ? _darkMuted : const Color(0xFF475569),
+            color: _isDarkMode ? Colors.white : const Color(0xFF475569),
             fontSize: 12,
             height: 1.4,
           ),
@@ -3559,7 +3693,11 @@ class _PostSignInPageState extends State<PostSignInPage>
               item.message,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: bodyColor, fontSize: 12.5, height: 1.45),
+              style: TextStyle(
+                color: _isDarkMode ? Colors.white : bodyColor,
+                fontSize: 12.5,
+                height: 1.45,
+              ),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -3622,7 +3760,7 @@ class _PostSignInPageState extends State<PostSignInPage>
               Text(
                 item.message,
                 style: TextStyle(
-                  color: bodyColor,
+                  color: _isDarkMode ? Colors.white : bodyColor,
                   fontSize: 13.2,
                   height: 1.45,
                 ),
@@ -5278,15 +5416,29 @@ class _PostSignInPageState extends State<PostSignInPage>
         backgroundColor: _isDarkMode ? _darkSurface : const Color(0xFF0B3B67),
         child: SafeArea(
           child: IconTheme.merge(
-            data: const IconThemeData(color: Colors.white),
+            data: IconThemeData(
+              color: _isDarkMode ? Colors.white : const Color(0xFFF8FAFC),
+            ),
             child: Theme(
               data: Theme.of(context).copyWith(
                 textTheme: Theme.of(context).textTheme.apply(
-                  bodyColor: Colors.white,
-                  displayColor: Colors.white,
+                  bodyColor:
+                      _isDarkMode ? Colors.white : const Color(0xFFF8FAFC),
+                  displayColor:
+                      _isDarkMode ? Colors.white : const Color(0xFFF8FAFC),
                 ),
-                dropdownMenuTheme: const DropdownMenuThemeData(
-                  textStyle: TextStyle(color: Colors.white),
+                listTileTheme: ListTileThemeData(
+                  iconColor:
+                      _isDarkMode ? Colors.white : const Color(0xFFF8FAFC),
+                  textColor:
+                      _isDarkMode ? Colors.white : const Color(0xFFF8FAFC),
+                ),
+                dropdownMenuTheme: DropdownMenuThemeData(
+                  textStyle: TextStyle(
+                    color: _isDarkMode
+                        ? Colors.white
+                        : const Color(0xFFF8FAFC),
+                  ),
                 ),
               ),
               child: ListView(
@@ -5356,8 +5508,14 @@ class _PostSignInPageState extends State<PostSignInPage>
                         dropdownColor: _isDarkMode
                             ? _darkSurface
                             : const Color(0xFF124A86),
-                        style: const TextStyle(color: Colors.white),
-                        iconEnabledColor: Colors.white,
+                        style: TextStyle(
+                          color: _isDarkMode
+                              ? Colors.white
+                              : const Color(0xFFF8FAFC),
+                        ),
+                        iconEnabledColor: _isDarkMode
+                            ? Colors.white
+                            : const Color(0xFFF8FAFC),
                         onChanged: (value) async {
                           if (value == null) {
                             return;
@@ -5367,9 +5525,29 @@ class _PostSignInPageState extends State<PostSignInPage>
                           });
                           await _persistLanguage(value);
                         },
-                        items: const [
-                          DropdownMenuItem(value: 'en', child: Text('English')),
-                          DropdownMenuItem(value: 'am', child: Text('Amharic')),
+                        items: [
+                          DropdownMenuItem(
+                            value: 'en',
+                            child: Text(
+                              'English',
+                              style: TextStyle(
+                                color: _isDarkMode
+                                    ? Colors.white
+                                    : const Color(0xFFF8FAFC),
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'am',
+                            child: Text(
+                              'Amharic',
+                              style: TextStyle(
+                                color: _isDarkMode
+                                    ? Colors.white
+                                    : const Color(0xFFF8FAFC),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -5384,8 +5562,14 @@ class _PostSignInPageState extends State<PostSignInPage>
                         dropdownColor: _isDarkMode
                             ? _darkSurface
                             : const Color(0xFF124A86),
-                        style: const TextStyle(color: Colors.white),
-                        iconEnabledColor: Colors.white,
+                        style: TextStyle(
+                          color: _isDarkMode
+                              ? Colors.white
+                              : const Color(0xFFF8FAFC),
+                        ),
+                        iconEnabledColor: _isDarkMode
+                            ? Colors.white
+                            : const Color(0xFFF8FAFC),
                         onChanged: (value) async {
                           if (value == null) {
                             return;
@@ -5402,7 +5586,14 @@ class _PostSignInPageState extends State<PostSignInPage>
                             .map(
                               (type) => DropdownMenuItem(
                                 value: type,
-                                child: Text(type.label),
+                                child: Text(
+                                  type.label,
+                                  style: TextStyle(
+                                    color: _isDarkMode
+                                        ? Colors.white
+                                        : const Color(0xFFF8FAFC),
+                                  ),
+                                ),
                               ),
                             )
                             .toList(),
