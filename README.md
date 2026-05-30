@@ -21,16 +21,10 @@ The platform streamlines customer management, billing operations, water consumpt
   <img src="screenshots/photo_2_2026-05-21_16-54-49.jpg" width="220">
   <img src="screenshots/photo_3_2026-05-21_16-54-49.jpg" width="220">
   <img src="screenshots/photo_4_2026-05-21_16-54-49.jpg" width="220">
-</p>
-
-<p align="center">
-  <img src="screenshots/photo_5_2026-05-21_16-54-49.jpg" width="220">
+   <img src="screenshots/photo_5_2026-05-21_16-54-49.jpg" width="220">
   <img src="screenshots/photo_6_2026-05-21_16-54-49.jpg" width="220">
   <img src="screenshots/photo_7_2026-05-21_16-54-49.jpg" width="220">
   <img src="screenshots/photo_8_2026-05-21_16-54-49.jpg" width="220">
-</p>
-
-<p align="center">
   <img src="screenshots/photo_9_2026-05-21_16-54-50.jpg" width="220">
   <img src="screenshots/photo_10_2026-05-21_16-54-50.jpg" width="220">
 </p>
