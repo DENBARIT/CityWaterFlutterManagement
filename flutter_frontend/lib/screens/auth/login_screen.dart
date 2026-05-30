@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:city_water_flutter/features/home/main.dart' as aqua_home;
+import 'package:city_water_flutter/my_flutter_app/main.dart' as aqua_home;
 import 'package:city_water_flutter/screens/auth/forgot_password_screen.dart';
 import 'package:city_water_flutter/screens/auth/register_screen.dart';
 import 'package:city_water_flutter/screens/post_sign_in_page.dart';
@@ -55,7 +55,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _signinHover = false;
   bool _homeHover = false;
   bool _showPassword = false;
-  bool _rememberMe = false;
   bool _isSubmitting = false;
   final Map<String, bool> _socialHover = <String, bool>{};
 
@@ -136,15 +135,6 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => _isSubmitting = false);
       }
     }
-  }
-
-  Future<void> _handleGoogleSignIn() async {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Google sign-in is disabled in this build.'),
-      ),
-    );
   }
 
   Future<void> _handleFacebookSignIn() async {
@@ -245,16 +235,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Stack(
                       children: [
                         Positioned(
-                          left: 25,
-                          top: 40,
+                          left: 16,
+                          top: 18,
                           child: MouseRegion(
                             cursor: SystemMouseCursors.click,
                             onEnter: (_) => setState(() => _homeHover = true),
                             onExit: (_) => setState(() => _homeHover = false),
                             child: Material(
                               color: Colors.transparent,
+                              elevation: 0,
                               child: InkWell(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(24),
                                 onTap: () {
                                   Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(
@@ -265,22 +256,64 @@ class _LoginScreenState extends State<LoginScreen> {
                                   );
                                 },
                                 child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 180),
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.easeOutCubic,
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 8,
+                                    horizontal: 14,
+                                    vertical: 10,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: _homeHover
-                                        ? const Color(0xFF0D47A1)
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(20),
+                                    gradient: LinearGradient(
+                                      colors: _homeHover
+                                          ? const [
+                                              Color(0xFF0B3B67),
+                                              Color(0xFF1E90FF),
+                                            ]
+                                          : const [
+                                              Color(0xFFFFFFFF),
+                                              Color(0xFFEAF4FF),
+                                            ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(
+                                      color: _homeHover
+                                          ? const Color(0xFF1E90FF)
+                                          : const Color(0xFFBFDBFE),
+                                      width: 1.2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: _homeHover ? 0.26 : 0.12,
+                                        ),
+                                        blurRadius: _homeHover ? 18 : 12,
+                                        offset: const Offset(0, 6),
+                                      ),
+                                    ],
                                   ),
-                                  child: Icon(
-                                    Icons.home_outlined,
-                                    color: _homeHover
-                                        ? Colors.white
-                                        : const Color(0xFF1E88E5),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.home_rounded,
+                                        size: 20,
+                                        color: _homeHover
+                                            ? Colors.white
+                                            : const Color(0xFF0B3B67),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Home',
+                                        style: TextStyle(
+                                          fontSize: 13.5,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.2,
+                                          color: _homeHover
+                                              ? Colors.white
+                                              : const Color(0xFF0B3B67),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -387,71 +420,43 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _passwordField(),
                                 const SizedBox(height: 10),
 
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Checkbox(
-                                          value: _rememberMe,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              _rememberMe = value!;
-                                            });
-                                          },
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: MouseRegion(
+                                    onEnter: (_) {
+                                      setState(() => _forgotHover = true);
+                                    },
+                                    onExit: (_) {
+                                      setState(() => _forgotHover = false);
+                                    },
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ForgotPasswordPage(),
                                           ),
-                                          activeColor: const Color(0xFF0072FF),
-                                        ),
-                                        const Text(
-                                          'Remember me',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0xFF4B5563),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    MouseRegion(
-                                      onEnter: (_) {
-                                        setState(() => _forgotHover = true);
+                                        );
                                       },
-                                      onExit: (_) {
-                                        setState(() => _forgotHover = false);
-                                      },
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ForgotPasswordPage(),
-                                            ),
-                                          );
-                                        },
-                                        child: AnimatedDefaultTextStyle(
-                                          duration: const Duration(
-                                            milliseconds: 200,
-                                          ),
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: _forgotHover
-                                                ? const Color(0xFF003A8F)
-                                                : const Color(0xFF3B82F6),
-                                            decoration: _forgotHover
-                                                ? TextDecoration.underline
-                                                : TextDecoration.none,
-                                          ),
-                                          child: const Text('Forgot Password?'),
+                                      child: AnimatedDefaultTextStyle(
+                                        duration: const Duration(
+                                          milliseconds: 200,
                                         ),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: _forgotHover
+                                              ? const Color(0xFF003A8F)
+                                              : const Color(0xFF3B82F6),
+                                          decoration: _forgotHover
+                                              ? TextDecoration.underline
+                                              : TextDecoration.none,
+                                        ),
+                                        child: const Text('Forgot Password?'),
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
                                 const SizedBox(height: 28),
 
@@ -459,75 +464,45 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _gradientButton('Sign In', () {
                                   _handleSignIn();
                                 }),
-                                const SizedBox(height: 28),
-
-                                // Divider
-                                _orDivider(),
-                                const SizedBox(height: 20),
-
-                                // Social buttons
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _socialButton(
-                                        label: 'Google',
-                                        icon: _googleMulticolorIcon(),
-                                        onTap: _handleGoogleSignIn,
-                                      ),
-                                    ),
-                                    if (AuthService.facebookLoginEnabled) ...[
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: _socialButton(
-                                          label: 'Facebook',
-                                          icon: const FaIcon(
-                                            FontAwesomeIcons.facebook,
-                                            size: 18,
-                                            color: Color(0xFF1877F2),
-                                          ),
-                                          onTap: _handleFacebookSignIn,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-
-                                const Spacer(),
+                                const SizedBox(height: 14),
 
                                 // Sign up
                                 Center(
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       const Text(
                                         "Don't have an account? ",
                                         style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color(0xFF6B7280),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF111827),
                                         ),
                                       ),
                                       MouseRegion(
-                                        onEnter: (_) =>
-                                            setState(() => _signupHover = true),
+                                        onEnter: (_) => setState(
+                                          () => _signupHover = true,
+                                        ),
                                         onExit: (_) => setState(
                                           () => _signupHover = false,
                                         ),
                                         child: GestureDetector(
                                           behavior: HitTestBehavior.opaque,
                                           onTapDown: (_) {
-                                            setState(
-                                              () => _signupPressed = true,
-                                            );
+                                            setState(() {
+                                              _signupPressed = true;
+                                            });
                                           },
                                           onTapCancel: () {
-                                            setState(
-                                              () => _signupPressed = false,
-                                            );
+                                            setState(() {
+                                              _signupPressed = false;
+                                            });
                                           },
                                           onTapUp: (_) {
-                                            setState(
-                                              () => _signupPressed = false,
-                                            );
+                                            setState(() {
+                                              _signupPressed = false;
+                                            });
                                           },
                                           onTap: () {
                                             Navigator.of(context).push(
@@ -537,31 +512,67 @@ class _LoginScreenState extends State<LoginScreen> {
                                               ),
                                             );
                                           },
-                                          child: AnimatedDefaultTextStyle(
+                                          child: AnimatedContainer(
                                             duration: const Duration(
-                                              milliseconds: 200,
+                                              milliseconds: 180,
                                             ),
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color:
-                                                  (_signupHover ||
-                                                      _signupPressed)
-                                                  ? const Color(0xFF003A8F)
-                                                  : const Color(0xFF3B82F6),
-                                              decoration:
-                                                  (_signupHover ||
-                                                      _signupPressed)
-                                                  ? TextDecoration.underline
-                                                  : TextDecoration.none,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 6,
                                             ),
-                                            child: const Text('Sign Up'),
+                                            decoration: BoxDecoration(
+                                              color: (_signupHover ||
+                                                      _signupPressed)
+                                                  ? const Color(0xFFEAF3FF)
+                                                  : const Color(0xFFF8FBFF),
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              border: Border.all(
+                                                color: (_signupHover ||
+                                                        _signupPressed)
+                                                    ? const Color(0xFF1E88E5)
+                                                    : const Color(0xFFBFDBFE),
+                                              ),
+                                            ),
+                                            child: AnimatedDefaultTextStyle(
+                                              duration: const Duration(
+                                                milliseconds: 180,
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w800,
+                                                color: (_signupHover ||
+                                                        _signupPressed)
+                                                    ? const Color(0xFF003A8F)
+                                                    : const Color(0xFF1E88E5),
+                                                decoration: TextDecoration.none,
+                                              ),
+                                              child: const Text('Sign Up'),
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
+                                const SizedBox(height: 18),
+
+                                // Divider
+                                _orDivider(),
+                                const SizedBox(height: 20),
+
+                                // Social buttons
+                                if (AuthService.facebookLoginEnabled)
+                                  _socialButton(
+                                    label: 'Facebook',
+                                    icon: const FaIcon(
+                                      FontAwesomeIcons.facebook,
+                                      size: 18,
+                                      color: Color(0xFF1877F2),
+                                    ),
+                                    onTap: _handleFacebookSignIn,
+                                  ),
+
                               ],
                             ),
                           ),
@@ -769,13 +780,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Row(
       children: const [
         Expanded(child: Divider(color: Color(0xFFE5E7EB), thickness: 1)),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Text(
-            'or continue with',
-            style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF)),
-          ),
-        ),
         Expanded(child: Divider(color: Color(0xFFE5E7EB), thickness: 1)),
       ],
     );
@@ -825,11 +829,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _googleMulticolorIcon() {
-    return const FaIcon(
-      FontAwesomeIcons.google,
-      size: 18,
-      color: Color(0xFF4285F4),
-    );
-  }
 }
