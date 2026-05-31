@@ -208,7 +208,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final isMobile = screenWidth <= 450;
-    final cardWidth = screenWidth > 450 ? 409.0 : screenWidth * 0.9;
+    // Make the login card a bit wider on larger screens and slightly wider on mobile
+    final cardWidth = screenWidth > 450 ? 520.0 : screenWidth * 0.94;
     final verticalPadding = isMobile ? 12.0 : 32.0;
     final viewportCardHeight = screenHeight - (verticalPadding * 2);
     final cardHeight = isMobile
@@ -234,18 +235,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.transparent,
                     child: Stack(
                       children: [
+                        // Back home button positioned just above the welcome text
                         Positioned(
-                          left: 16,
-                          top: 18,
+                          left: 40,
+                          top: 150,
                           child: MouseRegion(
                             cursor: SystemMouseCursors.click,
                             onEnter: (_) => setState(() => _homeHover = true),
                             onExit: (_) => setState(() => _homeHover = false),
                             child: Material(
                               color: Colors.transparent,
-                              elevation: 0,
                               child: InkWell(
-                                borderRadius: BorderRadius.circular(24),
+                                borderRadius: BorderRadius.circular(12),
                                 onTap: () {
                                   Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(
@@ -256,63 +257,101 @@ class _LoginScreenState extends State<LoginScreen> {
                                   );
                                 },
                                 child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  curve: Curves.easeOutCubic,
+                                  duration: const Duration(milliseconds: 180),
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 10,
+                                    horizontal: 10,
+                                    vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: _homeHover
-                                          ? const [
-                                              Color(0xFF0B3B67),
-                                              Color(0xFF1E90FF),
-                                            ]
-                                          : const [
-                                              Color(0xFFFFFFFF),
-                                              Color(0xFFEAF4FF),
-                                            ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(24),
-                                    border: Border.all(
-                                      color: _homeHover
-                                          ? const Color(0xFF1E90FF)
-                                          : const Color(0xFFBFDBFE),
-                                      width: 1.2,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(
-                                          alpha: _homeHover ? 0.26 : 0.12,
-                                        ),
-                                        blurRadius: _homeHover ? 18 : 12,
-                                        offset: const Offset(0, 6),
-                                      ),
-                                    ],
+                                    color: _homeHover
+                                        ? const Color(0xFF0B3B67)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons.home_rounded,
-                                        size: 20,
+                                        Icons.arrow_back_ios_new,
+                                        size: 16,
                                         color: _homeHover
                                             ? Colors.white
                                             : const Color(0xFF0B3B67),
                                       ),
                                       const SizedBox(width: 8),
-                                      Text(
-                                        'Home',
-                                        style: TextStyle(
-                                          fontSize: 13.5,
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: 0.2,
-                                          color: _homeHover
-                                              ? Colors.white
-                                              : const Color(0xFF0B3B67),
-                                        ),
-                                      ),
+                                      // Fancy single-colored (gradient) text when idle, white on hover
+                                      _homeHover
+                                          ? RichText(
+                                              text: TextSpan(
+                                                style: GoogleFonts.syne(
+                                                  textStyle: const TextStyle(
+                                                    color: Colors.white,
+                                                    shadows: [
+                                                      Shadow(
+                                                        color: Colors.black26,
+                                                        offset: Offset(0, 2),
+                                                        blurRadius: 4,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                children: const [
+                                                  TextSpan(
+                                                    text: 'Back ',
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: 'home',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.w900,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          : ShaderMask(
+                                              shaderCallback: (bounds) =>
+                                                  const LinearGradient(
+                                                colors: [
+                                                  Color(0xFF00C6FF),
+                                                  Color(0xFF0072FF),
+                                                ],
+                                              ).createShader(bounds),
+                                              blendMode: BlendMode.srcIn,
+                                              child: RichText(
+                                                text: TextSpan(
+                                                  style: GoogleFonts.syne(
+                                                    textStyle: const TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  children: const [
+                                                    TextSpan(
+                                                      text: 'Back ',
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: 'home',
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.w900,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
                                     ],
                                   ),
                                 ),
