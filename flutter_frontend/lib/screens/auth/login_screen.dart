@@ -110,6 +110,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('is_logged_in', true);
       await prefs.setString('logged_in_username', userName);
+      await prefs.setString('logged_in_identifier', identifier);
+      await prefs.setString('logged_in_email', identifier);
       if (data != null) {
         await prefs.setString(
           'login_access_token',
@@ -154,6 +156,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('is_logged_in', true);
       await prefs.setString('logged_in_username', userName);
+      await prefs.setString('logged_in_identifier', result['email']?.toString() ?? userName);
+      await prefs.setString('logged_in_email', result['email']?.toString() ?? userName);
       if (data != null) {
         await prefs.setString(
           'login_access_token',
