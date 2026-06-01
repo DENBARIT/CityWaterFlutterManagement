@@ -33,7 +33,7 @@ export const authenticate = async (req, res, next) => {
       return res.status(401).json({ message: 'Account is inactive or deleted' });
     }
 
-    // Attach full user object to request
+    // Attach full user object to request for downstream use
     req.user = user;
     next();
   } catch (err) {
