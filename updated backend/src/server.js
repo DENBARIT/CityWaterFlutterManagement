@@ -22,8 +22,29 @@ app.use(cors());
 // body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  const startedAt = Date.now();
+  console.log(`Incoming request: ${req.method} ${req.originalUrl}`);
+
+  res.on('finish', () => {
+    const durationMs = Date.now() - startedAt;
+    console.log(
+      `Request completed: ${req.method} ${req.originalUrl} -> ${res.statusCode} (${durationMs}ms)`
+    );
+  });
+
+  next();
+});
 const port = Number(process.env.PORT || 5001);
 // Routes
+
+app.get('/health', (_req, res) => {
+  console.log('Health check requested');
+  res.status(200).json({
+    status: 'ok',
+    message: 'Backend is listening and responding',
+  });
+});
 
 app.use('/auth', authRoutes);
 app.use('/locations', locationRoutes);
