@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 import 'dart:math' as math;
 
@@ -8,6 +9,7 @@ import 'package:city_water_flutter/services/auth_service.dart';
 import 'package:city_water_flutter/services/billing_service.dart';
 import 'package:city_water_flutter/services/complaint_service.dart';
 import 'package:city_water_flutter/services/ownership_change_service.dart';
+import 'package:city_water_flutter/services/receipt_service.dart';
 import 'package:city_water_flutter/services/schedule_notification_service.dart';
 import 'package:city_water_flutter/services/ocr_window_service.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +52,7 @@ class _PostSignInPageState extends State<PostSignInPage>
   static const String _usernameKey = 'logged_in_username';
   static const String _darkModeKey = 'is_dark_mode';
   static const String _ocrSubmissionKeyPrefix = 'ocr_last_submitted_cycle';
-  static const String _billHistoryKey = 'customer_billing_history_v1';
+  static const String _billHistoryKeyPrefix = 'customer_billing_history_v1';
 
   final List<DashboardFeature> _allFeatures = const [
     DashboardFeature.notifications,
@@ -91,8 +93,10 @@ class _PostSignInPageState extends State<PostSignInPage>
   List<WaterScheduleItem> _scheduleNotifications = const [];
   bool _isLoadingBills = false;
   bool _isPayingBill = false;
+  final Set<String> _isDownloadingReceiptForBill = <String>{};
   String? _billError;
   List<BillingBill> _billHistory = const [];
+  String _billingAccountScope = 'anonymous';
   String? _newlyGeneratedBillCycle;
   bool _isLoadingComplaintMessages = false;
   int _complaintUnreadCount = 0;
@@ -276,11 +280,27 @@ class _PostSignInPageState extends State<PostSignInPage>
     return null;
   }
 
+  String _normalizeBillingScope(String? value) {
+    final normalized = (value ?? '').trim().toLowerCase();
+    if (normalized.isEmpty) {
+      return 'anonymous';
+    }
+
+    return normalized.replaceAll(RegExp(r'[^a-z0-9]+'), '_');
+  }
+
+  String get _billHistoryKey =>
+      '${_billHistoryKeyPrefix}_${_normalizeBillingScope(_billingAccountScope)}';
+
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     final storedVisible = prefs.getStringList(_navPrefsKey) ?? const [];
     final storedLanguage = prefs.getString(_langKey) ?? 'en';
     final storedName = prefs.getString(_usernameKey);
+    final storedIdentifier =
+      prefs.getString('logged_in_identifier') ??
+      prefs.getString('logged_in_email') ??
+      prefs.getString('logged_in_phone');
     final storedDarkMode = prefs.getBool(_darkModeKey) ?? false;
     final storedCustomerType = await BillingService.loadSelectedCustomerType();
 
@@ -296,6 +316,10 @@ class _PostSignInPageState extends State<PostSignInPage>
           : (storedName?.trim().isNotEmpty == true
                 ? storedName!.trim()
                 : 'User');
+        _billingAccountScope =
+          storedIdentifier?.trim().isNotEmpty == true
+          ? storedIdentifier!.trim()
+          : (_username.trim().isNotEmpty ? _username.trim() : 'anonymous');
       _selectedCustomerType = storedCustomerType;
       _lastOcrSubmissionCycle = '';
 
@@ -935,6 +959,12 @@ class _PostSignInPageState extends State<PostSignInPage>
     try {
       final paidBill = await BillingService.payCurrentBill();
       await _upsertBillAndRefresh(paidBill);
+      File? receiptFile;
+      try {
+        receiptFile = await ReceiptService.generateReceipt(paidBill);
+      } catch (_) {
+        receiptFile = null;
+      }
 
       final checkout = paidBill.checkoutUrl;
       if (checkout != null && checkout.trim().isNotEmpty) {
@@ -953,10 +983,22 @@ class _PostSignInPageState extends State<PostSignInPage>
           behavior: SnackBarBehavior.floating,
           content: Text(
             _t(
-              'Payment completed in Chapa test mode. Status updated to PAID.',
-              'በChapa የሙከራ ሁኔታ ክፍያው ተጠናቋል። ሁኔታው PAID ሆኗል።',
+              receiptFile == null
+                  ? 'Payment completed. Receipt generation failed.'
+                  : 'Payment completed. Receipt saved and ready to download.',
+              receiptFile == null
+                  ? 'ክፍያው ተጠናቋል። ደረሰኝ መፍጠር አልተሳካም።'
+                  : 'ክፍያው ተጠናቋል። ደረሰኙ ተቀምጧል እና ለማውረድ ዝግጁ ነው።',
             ),
           ),
+          action: receiptFile == null
+              ? null
+              : SnackBarAction(
+                  label: _t('Download', 'አውርድ'),
+                  onPressed: () {
+                    ReceiptService.shareReceiptFile(receiptFile!);
+                  },
+                ),
         ),
       );
     } catch (error) {
@@ -974,6 +1016,55 @@ class _PostSignInPageState extends State<PostSignInPage>
       if (mounted) {
         setState(() {
           _isPayingBill = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _downloadBillReceipt(BillingBill bill) async {
+    if (_isDownloadingReceiptForBill.contains(bill.id)) {
+      return;
+    }
+
+    setState(() {
+      _isDownloadingReceiptForBill.add(bill.id);
+    });
+
+    try {
+      await ReceiptService.downloadReceipt(bill);
+
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            _t(
+              'Receipt is ready. Choose where to save or share it.',
+              'ደረሰኙ ዝግጁ ነው። የሚያስቀምጡበትን ወይም የሚያጋሩበትን ምርጫ ይምረጡ።',
+            ),
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            error.toString().replaceFirst('Exception: ', ''),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDownloadingReceiptForBill.remove(bill.id);
         });
       }
     }
@@ -3380,6 +3471,8 @@ class _PostSignInPageState extends State<PostSignInPage>
                     itemBuilder: (context, index) {
                       final bill = history[index];
                       final isPaid = bill.isPaid;
+                      final isDownloadingReceipt =
+                          _isDownloadingReceiptForBill.contains(bill.id);
                       final isNewest =
                           _newlyGeneratedBillCycle != null &&
                           bill.cycleKey == _newlyGeneratedBillCycle;
@@ -3502,38 +3595,106 @@ class _PostSignInPageState extends State<PostSignInPage>
                               ),
                             ],
                             const SizedBox(height: 10),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: ElevatedButton.icon(
-                                onPressed: (isPaid || _isPayingBill)
-                                    ? null
-                                    : () => _payBill(bill),
-                                icon: _isPayingBill
-                                    ? const SizedBox(
-                                        width: 14,
-                                        height: 14,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : Icon(
-                                        isPaid
-                                            ? Icons.check_circle_outline
-                                            : Icons.payments_outlined,
+                            Row(
+                              children: [
+                                if (isPaid)
+                                  DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(999),
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color(0xFF0EA5E9),
+                                          Color(0xFF2563EB),
+                                        ],
                                       ),
-                                label: Text(
-                                  isPaid
-                                      ? _t('Paid', 'ተከፍሏል')
-                                      : _t('Pay Now', 'አሁን ክፈል'),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Color(0x332563EB),
+                                          blurRadius: 12,
+                                          offset: Offset(0, 6),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ElevatedButton.icon(
+                                      onPressed: isDownloadingReceipt
+                                          ? null
+                                          : () => _downloadBillReceipt(bill),
+                                      icon: isDownloadingReceipt
+                                          ? const SizedBox(
+                                              width: 14,
+                                              height: 14,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : const Icon(
+                                              Icons.download_rounded,
+                                              size: 16,
+                                            ),
+                                      label: Text(
+                                        _t(
+                                          'Download Receipt',
+                                          'ደረሰኝ አውርድ',
+                                        ),
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        elevation: 0,
+                                        minimumSize: const Size(0, 36),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 8,
+                                        ),
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        visualDensity: VisualDensity.compact,
+                                        backgroundColor: Colors.transparent,
+                                        shadowColor: Colors.transparent,
+                                        foregroundColor: Colors.white,
+                                        disabledBackgroundColor:
+                                            Colors.transparent,
+                                        disabledForegroundColor: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                const Spacer(),
+                                ElevatedButton.icon(
+                                  onPressed: (isPaid || _isPayingBill)
+                                      ? null
+                                      : () => _payBill(bill),
+                                  icon: _isPayingBill
+                                      ? const SizedBox(
+                                          width: 14,
+                                          height: 14,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : Icon(
+                                          isPaid
+                                              ? Icons.check_circle_outline
+                                              : Icons.payments_outlined,
+                                        ),
+                                  label: Text(
+                                    isPaid
+                                        ? _t('Paid', 'ተከፍሏል')
+                                        : _t('Pay Now', 'አሁን ክፈል'),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: isPaid
+                                        ? const Color(0xFF16A34A)
+                                        : const Color(0xFF1E90FF),
+                                    foregroundColor: Colors.white,
+                                  ),
                                 ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isPaid
-                                      ? const Color(0xFF16A34A)
-                                      : const Color(0xFF1E90FF),
-                                  foregroundColor: Colors.white,
-                                ),
-                              ),
+                              ],
                             ),
                           ],
                         ),
