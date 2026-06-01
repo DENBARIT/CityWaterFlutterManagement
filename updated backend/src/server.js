@@ -17,13 +17,37 @@ if (process.env.ENABLE_EMAIL_QUEUE === 'true') {
 connectDB();
 
 const app = express();
+// respect proxy headers when running behind a reverse proxy/load balancer
+app.set('trust proxy', true);
 // Middleware
 app.use(cors());
 // body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  const startedAt = Date.now();
+  const remote = req.ip || req.connection?.remoteAddress || 'unknown';
+  console.log(`Incoming request: ${req.method} ${req.originalUrl} from ${remote}`);
+
+  res.on('finish', () => {
+    const durationMs = Date.now() - startedAt;
+    console.log(
+      `Request completed: ${req.method} ${req.originalUrl} -> ${res.statusCode} (${durationMs}ms) ${req.headers['user-agent'] ?? ''}`
+    );
+  });
+
+  next();
+});
 const port = Number(process.env.PORT || 5001);
 // Routes
+
+app.get('/health', (_req, res) => {
+  console.log('Health check requested');
+  res.status(200).json({
+    status: 'ok',
+    message: 'Backend is listening and responding',
+  });
+});
 
 app.use('/auth', authRoutes);
 app.use('/locations', locationRoutes);
@@ -70,7 +94,9 @@ server = app.listen(port, () => {
 });
 
 // Graceful shutdown helper
-const shutdown = async (code = 0) => {
+const shutdown = async (code = 0, reason = 'shutdown') => {
+  console.log(`Shutdown initiated (${reason}). Cleaning up...`);
+
   if (ocrLifecycleTimer) {
     clearInterval(ocrLifecycleTimer);
     ocrLifecycleTimer = null;
@@ -81,58 +107,68 @@ const shutdown = async (code = 0) => {
     billingLifecycleTimer = null;
   }
 
+  // Close server first so no new requests are accepted
+  if (server) {
+    try {
+      server.close(async (closeErr) => {
+        if (closeErr) {
+          console.error('Error closing server:', closeErr);
+        }
+
+        try {
+          await disconnectDB();
+        } catch (err) {
+          console.error('Error disconnecting DB:', err);
+        } finally {
+          console.log('Shutdown complete, exiting.');
+          process.exit(code);
+        }
+      });
+
+      // Force exit if close hangs
+      setTimeout(() => {
+        console.warn('Forcing shutdown after timeout');
+        process.exit(code);
+      }, 10000).unref();
+    } catch (err) {
+      console.error('Error during server close:', err);
+      try {
+        await disconnectDB();
+      } catch (dbErr) {
+        console.error('Error disconnecting DB after close failure:', dbErr);
+      }
+      process.exit(code);
+    }
+
+    return;
+  }
+
+  // If no server instance, just disconnect DB and exit
   try {
     await disconnectDB();
   } catch (err) {
     console.error('Error disconnecting DB:', err);
-  } finally {
-    process.exit(code);
   }
+
+  process.exit(code);
 };
 
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Rejection:', err);
-
-  if (server) {
-    server.close(() => {
-      shutdown(1);
-    });
-  } else {
-    shutdown(1);
-  }
+  void shutdown(1, 'unhandledRejection');
 });
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
-
-  if (server) {
-    server.close(() => {
-      shutdown(1);
-    });
-  } else {
-    shutdown(1);
-  }
+  void shutdown(1, 'uncaughtException');
 });
 
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully');
-
-  if (server) {
-    server.close(() => {
-      shutdown(0);
-    });
-  } else {
-    shutdown(0);
-  }
+  void shutdown(0, 'SIGTERM');
 });
 
 process.on('SIGINT', () => {
   console.log('SIGINT received, shutting down gracefully');
-  if (server) {
-    server.close(() => {
-      shutdown(0);
-    });
-  } else {
-    shutdown(0);
-  }
+  void shutdown(0, 'SIGINT');
 });
