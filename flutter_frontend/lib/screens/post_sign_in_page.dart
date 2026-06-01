@@ -5204,8 +5204,6 @@ class _PostSignInPageState extends State<PostSignInPage>
   }
 
   void _openMoreMenu() {
-    final hidden = _hiddenFeatures;
-    final visible = _visibleFeatures;
     final titleColor = Colors.white;
     final bodyColor = _isDarkMode ? _darkMuted : const Color(0xFFD6E4F5);
     final drawerBackground = _isDarkMode
@@ -5219,183 +5217,202 @@ class _PostSignInPageState extends State<PostSignInPage>
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
-        return SafeArea(
-          child: SizedBox(
-            height: 500,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    _t('More Widgets', 'ተጨማሪ ዊጅቶች'),
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.syne(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: titleColor,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    _t(
-                      'Use + to add a widget to the bottom bar and - to remove it.',
-                      '+ በመጠቀም ወደ ታችኛው ባር ያክሉ፣ - በመጠቀም ያስወግዱ።',
-                    ),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: bodyColor,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            _t('Bottom bar widgets', 'የታችኛው ባር ዊጅቶች'),
-                            style: TextStyle(
-                              color: titleColor,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: visible
-                                .map(
-                                  (feature) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _isDarkMode
-                                          ? const Color(0xFF132033)
-                                          : const Color(0xFF124A86),
-                                      borderRadius: BorderRadius.circular(18),
-                                      border: Border.all(
-                                        color: _isDarkMode
-                                            ? _darkBorder
-                                            : const Color(0xFF2B6CB0),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          _iconFor(feature),
-                                          size: 16,
-                                          color: _lightAccent,
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          _labelFor(feature),
-                                          style: TextStyle(
-                                            color: titleColor,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        InkWell(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                          onTap: _visibleFeatures.length <= 1
-                                              ? null
-                                              : () => _removeFeature(feature),
-                                          child: Icon(
-                                            Icons.remove_circle_outline,
-                                            size: 18,
-                                            color: _visibleFeatures.length <= 1
-                                                ? Colors.white30
-                                                : Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _t('Available widgets', 'ሊጨመሩ የሚችሉ ዊጅቶች'),
-                            style: TextStyle(
-                              color: titleColor,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: hidden
-                                .map(
-                                  (feature) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _isDarkMode
-                                          ? const Color(0xFF132033)
-                                          : const Color(0xFF124A86),
-                                      borderRadius: BorderRadius.circular(18),
-                                      border: Border.all(
-                                        color: _isDarkMode
-                                            ? _darkBorder
-                                            : const Color(0xFF2B6CB0),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          _iconFor(feature),
-                                          size: 16,
-                                          color: _lightAccent,
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          _labelFor(feature),
-                                          style: TextStyle(
-                                            color: titleColor,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        InkWell(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                          onTap: () => _addFeature(feature),
-                                          child: const Icon(
-                                            Icons.add_circle_outline,
-                                            size: 18,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ],
+        return StatefulBuilder(
+          builder: (context, modalSetState) {
+            final hidden = _hiddenFeatures;
+            final visible = _visibleFeatures;
+
+            return SafeArea(
+              child: SizedBox(
+                height: 500,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        _t('More Widgets', 'ተጨማሪ ዊጅቶች'),
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.syne(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: titleColor,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      Text(
+                        _t(
+                          'Use + to add a widget to the bottom bar and - to remove it.',
+                          '+ በመጠቀም ወደ ታችኛው ባር ያክሉ፣ - በመጠቀም ያስወግዱ።',
+                        ),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: bodyColor,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                _t('Bottom bar widgets', 'የታችኛው ባር ዊጅቶች'),
+                                style: TextStyle(
+                                  color: titleColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: visible
+                                    .map(
+                                      (feature) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: _isDarkMode
+                                              ? const Color(0xFF132033)
+                                              : const Color(0xFF124A86),
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          border: Border.all(
+                                            color: _isDarkMode
+                                                ? _darkBorder
+                                                : const Color(0xFF2B6CB0),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              _iconFor(feature),
+                                              size: 16,
+                                              color: _lightAccent,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              _labelFor(feature),
+                                              style: TextStyle(
+                                                color: titleColor,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            InkWell(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              onTap: visible.length <= 1
+                                                  ? null
+                                                  : () async {
+                                                      await _removeFeature(
+                                                        feature,
+                                                      );
+                                                      if (mounted) {
+                                                        modalSetState(() {});
+                                                      }
+                                                    },
+                                              child: Icon(
+                                                Icons.remove_circle_outline,
+                                                size: 18,
+                                                color: visible.length <= 1
+                                                    ? Colors.white30
+                                                    : Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                _t('Available widgets', 'ሊጨመሩ የሚችሉ ዊጅቶች'),
+                                style: TextStyle(
+                                  color: titleColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: hidden
+                                    .map(
+                                      (feature) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: _isDarkMode
+                                              ? const Color(0xFF132033)
+                                              : const Color(0xFF124A86),
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          border: Border.all(
+                                            color: _isDarkMode
+                                                ? _darkBorder
+                                                : const Color(0xFF2B6CB0),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              _iconFor(feature),
+                                              size: 16,
+                                              color: _lightAccent,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              _labelFor(feature),
+                                              style: TextStyle(
+                                                color: titleColor,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            InkWell(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              onTap: () async {
+                                                await _addFeature(feature);
+                                                if (mounted) {
+                                                  modalSetState(() {});
+                                                }
+                                              },
+                                              child: const Icon(
+                                                Icons.add_circle_outline,
+                                                size: 18,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
