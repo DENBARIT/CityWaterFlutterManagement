@@ -332,6 +332,7 @@ class SuperAdminController {
   }
 
   static async getSchedules(req, res) {
+    console.log("the query", req.query);  
     try {
       const result = await SuperAdminService.getSchedules(req.query);
       res.json(result);
