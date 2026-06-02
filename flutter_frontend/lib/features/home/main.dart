@@ -8,7 +8,6 @@ import 'package:video_player/video_player.dart';
 import 'package:city_water_flutter/screens/auth/login_screen.dart';
 import 'package:city_water_flutter/screens/auth/register_screen.dart';
 
-import 'testimonial_carousel.dart';
 
 part 'sections/section_shell.dart';
 part 'sections/magic_section.dart';
@@ -16,7 +15,7 @@ part 'sections/marquee_section.dart';
 part 'sections/faq_section.dart';
 part 'sections/landing_section.dart';
 part 'sections/feature_section.dart';
-part 'sections/testimonial_section.dart';
+// testimonial section removed
 part 'sections/footer_section.dart';
 
 const double _uniformSectionGap = 75;
@@ -136,29 +135,7 @@ class _AquaConnectHomeState extends State<AquaConnectHome> {
     ),
   ];
 
-  static const List<TestimonialData> _testimonials = <TestimonialData>[
-    TestimonialData(
-      name: 'Marta K.',
-      role: 'Residential Customer',
-      quote:
-          'AquaConnect helped me track my bills and fix a complaint in just a few taps. It is fast and reliable.',
-      rating: 5,
-    ),
-    TestimonialData(
-      name: 'Abel T.',
-      role: 'Small Business Owner',
-      quote:
-          'The announcements and usage section are excellent. I always know what is happening with water supply.',
-      rating: 4,
-    ),
-    TestimonialData(
-      name: 'Selam W.',
-      role: 'Community Representative',
-      quote:
-          'Service requests are easier now. The platform makes communication with administration much smoother.',
-      rating: 3,
-    ),
-  ];
+  // testimonials removed
 
   VideoPlayerController? _magicVideoController;
   bool _magicVideoReady = false;
@@ -299,11 +276,6 @@ class _AquaConnectHomeState extends State<AquaConnectHome> {
                         videoController: _magicVideoController,
                         isVideoReady: _magicVideoReady,
                       ),
-                    ),
-                    SizedBox(height: sectionGap),
-                    _StaggerReveal(
-                      delayMs: 280,
-                      child: _TestimonialSection(testimonials: _testimonials),
                     ),
                     SizedBox(height: sectionGap),
                     const _StaggerReveal(delayMs: 350, child: _FaqSection()),

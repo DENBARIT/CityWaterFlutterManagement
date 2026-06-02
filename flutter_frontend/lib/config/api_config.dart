@@ -12,6 +12,6 @@ class ApiConfig {
       return 'http://localhost:5001';
     }
 
-    return 'http://10.4.115.201:5001';
+    return 'http://10.4.105.105:5001';
   }
 }
