@@ -16,41 +16,27 @@ The platform streamlines customer management, billing operations, water consumpt
 
 ## Screenshots
 
-### Admin Dashboard
 
-<img src="screenshots/photo_1_2026-05-21_16-54-49.jpg" width="900" alt="Admin Dashboard">
-
-### Customer Management
-
-<img src="screenshots/photo_2_2026-05-21_16-54-49.jpg" width="900" alt="Customer Management">
-
-### Billing & Payments
-
-<img src="screenshots/photo_3_2026-05-21_16-54-49.jpg" width="900" alt="Billing & Payments">
-
-### Water Account Records
-
-<img src="screenshots/photo_4_2026-05-21_16-54-49.jpg" width="900" alt="Water Account Records">
-
-### Location & Service Area Management
-
-<img src="screenshots/photo_5_2026-05-21_16-54-49.jpg" width="900" alt="Location Management">
-
-### Reports & Analytics
-
-<img src="screenshots/photo_6_2026-05-21_16-54-49.jpg" width="900" alt="Reports and Analytics">
-
-### Mobile Application
+## Screenshots
 
 <p align="center">
-  <img src="screenshots/photo_7_2026-05-21_16-54-49.jpg" width="220" alt="Mobile App Screen 1">
-  <img src="screenshots/photo_8_2026-05-21_16-54-49.jpg" width="220" alt="Mobile App Screen 2">
-  <img src="screenshots/photo_9_2026-05-21_16-54-50.jpg" width="220" alt="Mobile App Screen 3">
+  <img src="screenshots/photo_1_2026-05-21_16-54-49.jpg" width="220">
+  <img src="screenshots/photo_2_2026-05-21_16-54-49.jpg" width="220">
+  <img src="screenshots/photo_3_2026-05-21_16-54-49.jpg" width="220">
+  <img src="screenshots/photo_4_2026-05-21_16-54-49.jpg" width="220">
 </p>
 
-### Authentication & Access Control
+<p align="center">
+  <img src="screenshots/photo_5_2026-05-21_16-54-49.jpg" width="220">
+  <img src="screenshots/photo_6_2026-05-21_16-54-49.jpg" width="220">
+  <img src="screenshots/photo_7_2026-05-21_16-54-49.jpg" width="220">
+  <img src="screenshots/photo_8_2026-05-21_16-54-49.jpg" width="220">
+</p>
 
-<img src="screenshots/photo_10_2026-05-21_16-54-50.jpg" width="900" alt="Authentication">
+<p align="center">
+  <img src="screenshots/photo_9_2026-05-21_16-54-50.jpg" width="220">
+  <img src="screenshots/photo_10_2026-05-21_16-54-50.jpg" width="220">
+</p>
 
 ---
 
