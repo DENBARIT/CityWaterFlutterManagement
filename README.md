@@ -14,8 +14,6 @@ The platform streamlines customer management, billing operations, water consumpt
 
 ---
 
-## Screenshots
-
 
 ## Screenshots
 
